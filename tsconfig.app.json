@@ -23,5 +23,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Roda em Node (lê o CSS do disco), por isso é verificado pelo tsconfig.node.json.
+  "exclude": ["src/styles/tokens.test.ts"]
 }

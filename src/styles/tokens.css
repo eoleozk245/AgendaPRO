@@ -1,0 +1,158 @@
+/*
+ * Tokens de design do AgendaPRO.
+ * Cores-base definidas no CLAUDE.md; as demais foram escolhidas e conferidas
+ * por contraste em src/styles/tokens.test.ts. Ao mudar uma cor, rode `npm test`.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Marca */
+  --color-brand: #2563eb;
+  --color-navy: #0b1f3a;
+
+  /* Fundos e superfícies */
+  --color-bg: #f4f7fc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #eef2f9;
+
+  /* Texto */
+  --color-text: #0b1f3a;
+  --color-text-secondary: #475569;
+  --color-text-disabled: #94a3b8;
+  --color-link: #1d4ed8;
+
+  /* Bordas e campos */
+  --color-border: #d6deeb;
+  --color-border-input: #7c8ba3;
+  --color-input-bg: #ffffff;
+  --color-input-disabled-bg: #eef2f9;
+
+  /* Ações */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-active: #1e40af;
+  --color-on-primary: #ffffff;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-on-danger: #ffffff;
+  --color-hover-overlay: rgb(11 31 58 / 6%);
+
+  /* Foco */
+  --color-focus: #2563eb;
+
+  /* Feedback: texto, fundo e borda de cada tom */
+  --color-success: #16a34a;
+  --color-success-text: #15803d;
+  --color-success-bg: #ecfdf3;
+  --color-success-border: #86efac;
+  --color-error: #dc2626;
+  --color-error-text: #b91c1c;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fca5a5;
+  --color-warning-text: #b45309;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fcd34d;
+  --color-info-text: #1d4ed8;
+  --color-info-bg: #eff6ff;
+  --color-info-border: #93c5fd;
+  --color-neutral-text: #475569;
+  --color-neutral-bg: #eef2f9;
+  --color-neutral-border: #d6deeb;
+
+  --shadow-sm: 0 1px 2px rgb(11 31 58 / 6%);
+  --shadow-md: 0 4px 16px rgb(11 31 58 / 8%);
+
+  /* Espaçamento (múltiplos de 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Raios (8 a 14px) */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  /* Tipografia */
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Movimento */
+  --duration-fast: 120ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Alvos de toque */
+  --control-height-sm: 36px;
+  --control-height-md: 44px;
+}
+
+/*
+ * Tema escuro revisado à parte (não é o claro invertido): superfícies sobem de
+ * tom em vez de usar sombra, texto não é branco puro e os tons de feedback são
+ * mais claros para manter o contraste sobre fundo escuro.
+ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #111827;
+  --color-surface: #1a2333;
+  --color-surface-muted: #222d40;
+
+  --color-text: #e6ebf3;
+  --color-text-secondary: #a3aec2;
+  --color-text-disabled: #5b6b85;
+  --color-link: #60a5fa;
+
+  --color-border: #2e3a50;
+  --color-border-input: #7a889f;
+  --color-input-bg: #111827;
+  --color-input-disabled-bg: #222d40;
+
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-active: #1e40af;
+  --color-on-primary: #ffffff;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-on-danger: #ffffff;
+  --color-hover-overlay: rgb(230 235 243 / 8%);
+
+  --color-focus: #60a5fa;
+
+  --color-success: #4ade80;
+  --color-success-text: #4ade80;
+  --color-success-bg: #0f2a1c;
+  --color-success-border: #166534;
+  --color-error: #f87171;
+  --color-error-text: #f87171;
+  --color-error-bg: #2d1518;
+  --color-error-border: #7f1d1d;
+  --color-warning-text: #fbbf24;
+  --color-warning-bg: #2b2111;
+  --color-warning-border: #78350f;
+  --color-info-text: #60a5fa;
+  --color-info-bg: #12223f;
+  --color-info-border: #1e3a8a;
+  --color-neutral-text: #a3aec2;
+  --color-neutral-bg: #222d40;
+  --color-neutral-border: #2e3a50;
+
+  --shadow-sm: none;
+  --shadow-md: 0 4px 16px rgb(0 0 0 / 35%);
+}
