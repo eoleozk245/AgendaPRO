@@ -111,7 +111,8 @@ describe('PublicBookingPage', () => {
     expect(screen.getByLabelText(/Telefone/)).toHaveValue('(11) 98765-4321')
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar agendamento' }))
     const heading = await screen.findByRole('heading', { name: 'Pedido de agendamento enviado' })
-    expect(heading).toHaveFocus()
+    // O foco é aplicado num efeito depois de pintar a tela: espera em vez de conferir na hora.
+    await waitFor(() => expect(heading).toHaveFocus())
     expect(screen.getByText('segunda-feira, 7 de janeiro às 14:30')).toBeInTheDocument()
     expect(screen.getByText('Aguardando confirmação')).toBeInTheDocument()
     expect(api.bookAppointment).toHaveBeenCalledWith({
