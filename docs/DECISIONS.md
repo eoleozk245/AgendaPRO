@@ -104,6 +104,17 @@
 - A busca de clientes filtra no navegador. Com muitos clientes vai precisar de busca e paginação no servidor (registrado como pendente).
 - No celular, as tabelas viram cartões em vez de rolar para os lados.
 
+### D-015 — Agenda
+
+**Confirmado (por delegação).** Resolve a pendência "FullCalendar ou grade própria".
+
+- **Grade própria**, sem FullCalendar. O MVP precisa só de dia e semana, com um profissional. A grade própria pesa bem menos, segue o design system nos dois temas e foi feita acessível desde o começo (cada agendamento é um botão com texto completo). O FullCalendar volta a ser opção se surgir arrastar e soltar ou várias colunas de profissionais.
+- Visão do **dia**: linha do tempo com o expediente listrado por fora, a linha de "agora" e os bloqueios. Os cancelados aparecem numa lista abaixo. Visão da **semana**: lista por dia, que funciona igual no computador e no celular.
+- O dono **pode** agendar fora do expediente (encaixe): a tela avisa, mas não bloqueia. A página pública nunca oferece esses horários.
+- Agendamento **não é apagado**, só cancelado (fica no histórico). Apagar o cliente deixa o agendamento sem vínculo pessoal (LGPD).
+- "Concluído" e "Não compareceu" só aparecem depois do horário de início.
+- O fuso é convertido no navegador por um utilitário com testes (inclusive horário de verão). As datas viajam em UTC.
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -118,7 +129,6 @@
 
 ## Pendente
 
-- Calendário: FullCalendar ou grade própria (decidir na Etapa 4).
 - Hospedagem: Vercel ou Cloudflare Pages (decidir na Etapa 6).
 - Política de cancelamento e reagendamento (antecedência mínima).
 - Política de retenção e exclusão de dados (LGPD).

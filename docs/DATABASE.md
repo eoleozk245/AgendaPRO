@@ -29,6 +29,7 @@ Projeto Supabase: `AgendaPRO` (ref `xlafrbbugxypjuuadszg`, região `sa-east-1`).
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `20261026060000_organizations_and_memberships.sql`        | Sim (26/10/2026, via Supabase MCP)                                                                                     |
 | `20261026080000_services_professionals_hours_clients.sql` | **Não.** A ferramenta pediu confirmação do dono e ficou sem resposta. Testada no PostgreSQL local (`npm run test:db`). |
+| `20261026100000_appointments_and_blocks.sql`              | **Não** (aguarda a anterior). Testada no PostgreSQL local.                                                             |
 
 O Supabase registra cada migração com o horário em que foi aplicada, então o número de versão no painel pode ser diferente do nome do arquivo. O conteúdo é o mesmo.
 

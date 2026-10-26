@@ -40,7 +40,12 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
             <h2 id={titleId} className={styles.title}>
               {title}
             </h2>
-            <button type="button" className={styles.close} onClick={onClose} aria-label="Fechar">
+            <button
+              type="button"
+              className={styles.close}
+              onClick={onClose}
+              aria-label="Fechar janela"
+            >
               <X size={20} aria-hidden="true" />
             </button>
           </div>

@@ -1,6 +1,7 @@
 // Gerado a partir do banco (Supabase "generate types"). Gere de novo depois de
 // cada migração aplicada. As tabelas da Etapa 3 foram escritas à mão no mesmo
 // formato porque a migração ainda não foi aplicada no projeto remoto.
+// O mesmo vale para as tabelas da Etapa 4 (appointments, availability_blocks).
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
@@ -9,6 +10,82 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          cancelled_at: string | null
+          client_id: string | null
+          created_at: string
+          duration_minutes: number
+          ends_at: string
+          id: string
+          notes: string | null
+          organization_id: string
+          price_cents: number
+          professional_id: string
+          service_id: string
+          service_name: string
+          source: string
+          starts_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          notes?: string | null
+          organization_id: string
+          professional_id: string
+          service_id: string
+          starts_at: string
+          status?: string
+        }
+        Update: {
+          client_id?: string | null
+          notes?: string | null
+          professional_id?: string
+          service_id?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'appointments_client_fkey'
+            columns: ['client_id', 'organization_id']
+            isOneToOne: false
+            referencedRelation: 'clients'
+            referencedColumns: ['id', 'organization_id']
+          },
+        ]
+      }
+      availability_blocks: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          organization_id: string
+          professional_id: string
+          reason: string | null
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          organization_id: string
+          professional_id: string
+          reason?: string | null
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          organization_id?: string
+          professional_id?: string
+          reason?: string | null
+          starts_at?: string
+        }
+        Relationships: []
+      }
       business_hours: {
         Row: {
           closes_at: string
@@ -245,3 +322,5 @@ export type Service = Row<'services'>
 export type Professional = Row<'professionals'>
 export type BusinessHour = Row<'business_hours'>
 export type Client = Row<'clients'>
+export type Appointment = Row<'appointments'>
+export type AvailabilityBlock = Row<'availability_blocks'>

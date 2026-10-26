@@ -1,7 +1,7 @@
 // Traduz códigos de erro do PostgreSQL/Supabase em mensagens para quem usa,
 // sem expor detalhes internos.
 
-type DbError = { code?: string | null } | null | undefined
+type DbError = { code?: string | null; message?: string | null } | null | undefined
 
 const defaults: Record<string, string> = {
   '23505': 'Já existe um cadastro com esses dados.',
@@ -13,6 +13,8 @@ const defaults: Record<string, string> = {
 
 export function dbErrorMessage(error: DbError, overrides: Record<string, string> = {}): string {
   const code = error?.code ?? ''
+  // P0001 só é lançado pelas nossas funções no banco, com mensagens escritas para quem usa.
+  if (code === 'P0001' && error?.message && !overrides[code]) return error.message
   return (
     overrides[code] ?? defaults[code] ?? 'Não foi possível salvar agora. Verifique sua conexão.'
   )

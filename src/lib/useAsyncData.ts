@@ -3,19 +3,22 @@ import { useCallback, useEffect, useState } from 'react'
 export type AsyncState<T> =
   { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: T }
 
+type Result<T> = { load: () => Promise<T>; state: AsyncState<T> }
+
 /**
  * Carrega dados com estados de carregamento e erro. `load` precisa ser estável
- * (useCallback). Ao recarregar, os dados atuais continuam na tela até chegar a resposta.
+ * (useCallback): quando ele muda (ex.: outro dia na agenda), volta a "carregando".
+ * Já `reload()` mantém os dados atuais na tela até a nova resposta chegar.
  */
 export function useAsyncData<T>(load: () => Promise<T>) {
-  const [state, setState] = useState<AsyncState<T>>({ status: 'loading' })
+  const [result, setResult] = useState<Result<T> | null>(null)
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     let active = true
     load()
-      .then((data) => active && setState({ status: 'ready', data }))
-      .catch(() => active && setState({ status: 'error' }))
+      .then((data) => active && setResult({ load, state: { status: 'ready', data } }))
+      .catch(() => active && setResult({ load, state: { status: 'error' } }))
     return () => {
       active = false
     }
@@ -23,9 +26,10 @@ export function useAsyncData<T>(load: () => Promise<T>) {
 
   const reload = useCallback(() => setAttempt((value) => value + 1), [])
   const retry = useCallback(() => {
-    setState({ status: 'loading' })
+    setResult(null)
     setAttempt((value) => value + 1)
   }, [])
 
+  const state: AsyncState<T> = result && result.load === load ? result.state : { status: 'loading' }
   return { state, reload, retry }
 }
