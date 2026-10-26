@@ -39,6 +39,7 @@ Depois, rodar os testes pgTAP no projeto (ver `DATABASE.md`) e conferir o Adviso
 
 ## Verificações feitas
 
+- **GitHub Actions verde** no PR (jobs App e Banco). A primeira execução pegou um teste com corrida de tempo, já corrigido.
 - `npm run lint`, `format:check`, `typecheck` e `build`: sem erros.
 - `npm test`: **188 testes** passando (componentes, telas, regras de negócio, contraste, fuso, dinheiro, estados, cabeçalhos de segurança).
 - `npm run test:db`: **85 testes pgTAP** passando no PostgreSQL 16 local, com as 4 migrações (isolamento 16, cadastros 22, agenda 27, página pública 20). Também rodou como usuário comum, igual ao CI.
@@ -48,7 +49,6 @@ Depois, rodar os testes pgTAP no projeto (ver `DATABASE.md`) e conferir o Adviso
   - Build servido com os cabeçalhos de `public/_headers`: nenhum bloqueio do CSP, tema e fonte funcionando.
 - **Não verificado:**
   - As migrações 2 a 4 no Supabase real (só no PostgreSQL 16 local; o projeto usa 17).
-  - O workflow do GitHub Actions, que só roda no GitHub (a mesma sequência rodou localmente).
   - O envio real do e-mail de confirmação de cadastro.
   - Leitores de tela de verdade (NVDA, VoiceOver): só o axe e a navegação por teclado.
 
