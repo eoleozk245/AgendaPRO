@@ -4,7 +4,12 @@ import { supabase } from '../../lib/supabase.ts'
 
 export async function updateOrganization(
   id: string,
-  values: { name: string; timezone: string },
+  values: {
+    name: string
+    timezone: string
+    booking_min_notice_minutes: number
+    booking_max_days_ahead: number
+  },
 ): Promise<Organization> {
   const { data, error } = await supabase
     .from('organizations')

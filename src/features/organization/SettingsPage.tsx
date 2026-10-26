@@ -1,4 +1,6 @@
+import { ExternalLink } from 'lucide-react'
 import { useCallback, useState, type FormEvent } from 'react'
+import { Link } from 'react-router'
 import { z } from 'zod'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
@@ -15,6 +17,18 @@ import { listProfessionals, renameProfessional, updateOrganization } from './set
 import styles from './SettingsPage.module.css'
 import { BRAZIL_TIMEZONES } from './timezones.ts'
 
+const MIN_NOTICE_OPTIONS = [
+  { value: 0, label: 'Sem antecedência' },
+  { value: 30, label: '30 minutos' },
+  { value: 60, label: '1 hora' },
+  { value: 120, label: '2 horas' },
+  { value: 240, label: '4 horas' },
+  { value: 720, label: '12 horas' },
+  { value: 1440, label: '1 dia' },
+  { value: 2880, label: '2 dias' },
+]
+const MAX_DAYS_OPTIONS = [7, 14, 30, 60, 90]
+
 const nameSchema = z
   .string()
   .trim()
@@ -25,6 +39,8 @@ export function SettingsPage() {
   const { organization, setOrganization } = useOrganization()
   const [name, setName] = useState(organization.name)
   const [timezone, setTimezone] = useState(organization.timezone)
+  const [minNotice, setMinNotice] = useState(organization.booking_min_notice_minutes)
+  const [maxDays, setMaxDays] = useState(organization.booking_max_days_ahead)
   const [nameError, setNameError] = useState<string>()
   const [result, setResult] = useState<{ tone: 'success' | 'error'; text: string }>()
   const [saving, setSaving] = useState(false)
@@ -40,7 +56,14 @@ export function SettingsPage() {
     setResult(undefined)
     setSaving(true)
     try {
-      setOrganization(await updateOrganization(organization.id, { name: parsed.data, timezone }))
+      setOrganization(
+        await updateOrganization(organization.id, {
+          name: parsed.data,
+          timezone,
+          booking_min_notice_minutes: minNotice,
+          booking_max_days_ahead: maxDays,
+        }),
+      )
       setResult({ tone: 'success', text: 'Dados salvos.' })
     } catch (error) {
       setResult({ tone: 'error', text: errorText(error) })
@@ -73,6 +96,18 @@ export function SettingsPage() {
               readOnly
               hint="O endereço não muda depois de criado, para não quebrar links já divulgados."
             />
+            <p>
+              <Link
+                to={`/${organization.slug}`}
+                target="_blank"
+                rel="noopener"
+                className={styles.link}
+              >
+                Abrir a página de agendamento
+                <ExternalLink size={14} aria-hidden="true" />
+                <span className="visually-hidden"> (abre em nova aba)</span>
+              </Link>
+            </p>
             <SelectField
               label="Fuso horário"
               value={timezone}
@@ -82,6 +117,30 @@ export function SettingsPage() {
               {timezoneOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
+                </option>
+              ))}
+            </SelectField>
+            <h2 className={styles.sectionTitle}>Regras da página de agendamento</h2>
+            <SelectField
+              label="Antecedência mínima"
+              value={minNotice}
+              onChange={(event) => setMinNotice(Number(event.target.value))}
+              hint="Clientes não conseguem reservar horários mais próximos que isso."
+            >
+              {MIN_NOTICE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </SelectField>
+            <SelectField
+              label="Reservas até"
+              value={maxDays}
+              onChange={(event) => setMaxDays(Number(event.target.value))}
+            >
+              {MAX_DAYS_OPTIONS.map((days) => (
+                <option key={days} value={days}>
+                  {days} dias à frente
                 </option>
               ))}
             </SelectField>

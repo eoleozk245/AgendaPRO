@@ -115,6 +115,19 @@
 - "Concluído" e "Não compareceu" só aparecem depois do horário de início.
 - O fuso é convertido no navegador por um utilitário com testes (inclusive horário de verão). As datas viajam em UTC.
 
+### D-016 — Página pública de agendamento
+
+**Confirmado (por delegação).** Resolve em parte a pendência "política de cancelamento e reagendamento".
+
+- Endereço `/{slug}`, sem login. O visitante só chama três funções no banco: `get_public_booking_page`, `get_available_slots` e `book_appointment`. Nunca grava direto em tabelas.
+- Horários de **15 em 15 minutos** dentro do expediente, cabendo o serviço inteiro antes do fechamento, sem agendamentos ativos nem bloqueios no caminho.
+- **Antecedência mínima** configurável (padrão: 2 horas) e **limite de dias à frente** (padrão: 60), em "Estabelecimento".
+- A reserva nasce **pendente** e o estabelecimento confirma no painel. A função confere de novo se o horário está entre os livres, e se duas pessoas reservarem ao mesmo tempo, o banco recusa a segunda.
+- **Limite de tentativas:** 5 por IP a cada 10 minutos, 30 por estabelecimento por minuto e no máximo 3 agendamentos futuros por telefone. As tentativas que falham também contam (a função devolve `{ok:false}` em vez de lançar erro, para o registro não ser desfeito). O registro guarda só IP e horário, por 24 horas.
+- O cliente é identificado pelo **telefone**. Se já existe, o cadastro é reaproveitado sem sobrescrever o nome que o estabelecimento guardou.
+- Aviso de uso dos dados no formulário (nome e telefone só para o agendamento).
+- **Fora do MVP:** o cliente cancelar ou remarcar sozinho pela página (por enquanto, fala com o estabelecimento).
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -130,7 +143,7 @@
 ## Pendente
 
 - Hospedagem: Vercel ou Cloudflare Pages (decidir na Etapa 6).
-- Política de cancelamento e reagendamento (antecedência mínima).
+- Cancelamento e remarcação pelo próprio cliente (hoje só pelo estabelecimento).
 - Política de retenção e exclusão de dados (LGPD).
 - Playwright (testes de ponta a ponta): decidir quando o fluxo central estiver pronto.
 - Componente de menu suspenso: criar quando uma tela precisar.
@@ -138,7 +151,7 @@
 
 ## Fora do MVP
 
-Administração global da plataforma, e-mails e lembretes, pagamentos e sinal, lista de espera, agendamentos recorrentes, planos e assinaturas, tabelas `notifications` e `audit_logs` (entram junto com e-mails e auditoria).
+Administração global da plataforma, cancelamento pelo cliente na página pública, e-mails e lembretes, pagamentos e sinal, lista de espera, agendamentos recorrentes, planos e assinaturas, tabelas `notifications` e `audit_logs` (entram junto com e-mails e auditoria).
 
 ## Roadmap
 

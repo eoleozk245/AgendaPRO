@@ -27,7 +27,14 @@ Não dá para mudar estas configurações pelas ferramentas desta sessão. Elas 
 - **Senha mínima de 8 caracteres** (o padrão do Supabase é 6). A tela já exige 8, mas a garantia precisa estar no servidor.
 - **URL Configuration:** colocar `http://localhost:5173` em Site URL / Redirect URLs para o link de confirmação de e-mail voltar ao app em desenvolvimento. Quando houver domínio, adicionar o domínio também.
 
+## Página pública e limite de requisições
+
+- O visitante não tem acesso a nenhuma tabela. A página usa só as três funções públicas (ver `DATABASE.md`).
+- Limites: 5 tentativas por IP a cada 10 minutos, 30 por estabelecimento por minuto e 3 agendamentos futuros por telefone. As falhas também contam.
+- O IP vem dos cabeçalhos repassados pelo Supabase (`cf-connecting-ip` / `x-forwarded-for`). Se ele não vier, valem os outros limites.
+- Os horários livres não revelam quem ocupa os outros.
+
 ## Pendências
 
-- Limite de requisições na reserva pública (Etapa 5).
+- Proteção extra contra robôs na reserva (ex.: CAPTCHA/Turnstile) se aparecer abuso de verdade.
 - LGPD antes de uso com clientes reais (ver `DECISIONS.md`).

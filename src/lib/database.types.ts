@@ -1,7 +1,8 @@
 // Gerado a partir do banco (Supabase "generate types"). Gere de novo depois de
 // cada migração aplicada. As tabelas da Etapa 3 foram escritas à mão no mesmo
 // formato porque a migração ainda não foi aplicada no projeto remoto.
-// O mesmo vale para as tabelas da Etapa 4 (appointments, availability_blocks).
+// O mesmo vale para as tabelas da Etapa 4 (appointments, availability_blocks)
+// e para as funções e colunas da Etapa 5 (página pública).
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
@@ -258,6 +259,8 @@ export type Database = {
       }
       organizations: {
         Row: {
+          booking_max_days_ahead: number
+          booking_min_notice_minutes: number
           created_at: string
           id: string
           name: string
@@ -266,6 +269,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          booking_max_days_ahead?: number
+          booking_min_notice_minutes?: number
           created_at?: string
           id?: string
           name: string
@@ -274,6 +279,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          booking_max_days_ahead?: number
+          booking_min_notice_minutes?: number
           created_at?: string
           id?: string
           name?: string
@@ -288,9 +295,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      book_appointment: {
+        Args: {
+          p_slug: string
+          p_service_id: string
+          p_professional_id: string
+          p_starts_at: string
+          p_client_name: string
+          p_client_phone: string
+        }
+        Returns: Json
+      }
+      get_available_slots: {
+        Args: { p_slug: string; p_service_id: string; p_professional_id: string; p_date: string }
+        Returns: { starts_at: string }[]
+      }
+      get_public_booking_page: {
+        Args: { p_slug: string }
+        Returns: Json
+      }
       create_organization: {
         Args: { org_name: string; org_slug: string }
         Returns: {
+          booking_max_days_ahead: number
+          booking_min_notice_minutes: number
           created_at: string
           id: string
           name: string

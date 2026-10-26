@@ -10,6 +10,8 @@ const organization = {
   name: 'Barbearia do Zé',
   slug: 'barbearia-do-ze',
   timezone: 'America/Sao_Paulo',
+  booking_min_notice_minutes: 120,
+  booking_max_days_ahead: 60,
   created_at: '',
   updated_at: '',
 }
