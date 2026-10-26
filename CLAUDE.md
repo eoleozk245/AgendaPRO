@@ -35,15 +35,15 @@ React + TypeScript + Vite no frontend. Supabase (PostgreSQL, Auth, RLS) no backe
 
 SaaS premium, minimalista, com cara de tecnologia e sem excesso de efeitos. Tema claro e escuro (seguindo o sistema, com troca manual e preferência salva).
 
-| Token | Cor |
-|---|---|
+| Token                     | Cor       |
+| ------------------------- | --------- |
 | Azul elétrico (principal) | `#2563EB` |
-| Azul-marinho | `#0B1F3A` |
-| Fundo claro | `#F4F7FC` |
-| Superfície clara | `#FFFFFF` |
-| Fundo escuro | `#111827` |
-| Sucesso | `#16A34A` |
-| Erro | `#DC2626` |
+| Azul-marinho              | `#0B1F3A` |
+| Fundo claro               | `#F4F7FC` |
+| Superfície clara          | `#FFFFFF` |
+| Fundo escuro              | `#111827` |
+| Sucesso                   | `#16A34A` |
+| Erro                      | `#DC2626` |
 
 - Fonte: Inter ou Geist. Ícones: Lucide (nada de emoji como ícone de interface).
 - Espaçamentos em múltiplos de 4/8 px, raios de 8 a 14 px, poucos gradientes e animações discretas.
