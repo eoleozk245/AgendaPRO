@@ -44,8 +44,11 @@ function AppShell() {
   const signedIn = auth.status === 'ready' && auth.session !== null
   return (
     <div className={styles.shell}>
+      <a href="#conteudo" className="skip-link">
+        Pular para o conteúdo
+      </a>
       <AppHeader onSignOut={signedIn ? () => void supabase.auth.signOut() : undefined} />
-      <main>
+      <main id="conteudo" tabIndex={-1}>
         <Outlet />
       </main>
     </div>

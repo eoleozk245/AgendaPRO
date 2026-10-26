@@ -21,6 +21,9 @@ export function PublicBookingPage() {
 
   return (
     <div className={styles.page}>
+      <a href="#conteudo" className="skip-link">
+        Pular para o conteúdo
+      </a>
       <header className={styles.header}>
         <div className={styles.brand}>
           <span className={styles.logo} aria-hidden="true">
@@ -30,7 +33,7 @@ export function PublicBookingPage() {
         </div>
         <ThemeToggle value={preference} onChange={setPreference} />
       </header>
-      <main className={styles.main}>
+      <main id="conteudo" tabIndex={-1} className={styles.main}>
         {state.status === 'loading' && <LoadingState label="Carregando a página de agendamento" />}
         {state.status === 'error' && (
           <Alert tone="error" title="Não foi possível carregar a página.">

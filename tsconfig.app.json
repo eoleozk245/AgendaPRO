@@ -25,5 +25,5 @@
   },
   "include": ["src"],
   // Roda em Node (lê o CSS do disco), por isso é verificado pelo tsconfig.node.json.
-  "exclude": ["src/styles/tokens.test.ts"]
+  "exclude": ["src/styles/tokens.test.ts", "src/security-headers.test.ts"]
 }

@@ -2,7 +2,7 @@
 
 Última atualização: 26/10/2026
 
-**Como ler este arquivo:** as decisões abaixo marcadas como _Confirmado_ foram aprovadas pelo Léo. As D-002 a D-005 foram **decididas por delegação** (ele pediu para escolher o que fosse melhor, seguindo as instruções do projeto) e podem ser revistas a qualquer momento. Nada aqui está implementado ainda: este arquivo registra decisões, não código pronto.
+**Como ler este arquivo:** as decisões marcadas como _Confirmado_ foram aprovadas pelo Léo. As marcadas **por delegação** foram tomadas pelo Claude porque o Léo pediu para escolher o que fosse melhor (D-002 a D-005) ou para tocar todas as fases em modo automático (D-011 em diante). Todas podem ser revistas. _Proposta_ ainda precisa de aprovação. O que já está implementado aparece em `STATUS.md`.
 
 ## Decisões
 
@@ -128,6 +128,22 @@
 - Aviso de uso dos dados no formulário (nome e telefone só para o agendamento).
 - **Fora do MVP:** o cliente cancelar ou remarcar sozinho pela página (por enquanto, fala com o estabelecimento).
 
+### D-017 — CI e segurança de publicação
+
+**Confirmado (por delegação).**
+
+- **GitHub Actions** em todo PR e na `main`, com dois jobs: app (lint, formatação, tipos, testes e build) e banco (PostgreSQL 16 + pgTAP via `scripts/test-db.sh`). Necessidade concreta: o projeto já tem migrações e regras críticas que precisam ser verificadas sempre.
+- **Content Security Policy** e outros cabeçalhos em `public/_headers`. O script de tema é liberado por hash, e um teste confere se o hash bate com o `index.html`.
+- **Playwright** não entrou como dependência: os fluxos foram verificados no navegador com scripts temporários. Entra quando as migrações estiverem aplicadas e der para rodar ponta a ponta contra um banco de teste.
+
+### D-018 — Hospedagem
+
+**Proposta (precisa da aprovação do Léo).** Resolve a pendência "Vercel ou Cloudflare Pages".
+
+- Recomendação: **Cloudflare Pages**. O plano gratuito permite uso comercial (o Hobby da Vercel não permite, e D-005 prevê uso comercial no futuro), tem CDN global e lê `public/_headers`.
+- A Vercel continua boa para portfólio, mas para vender exigiria o plano Pro (pago).
+- Nada foi publicado. Publicar expõe o produto ao público e depende da LGPD (D-005).
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -142,10 +158,10 @@
 
 ## Pendente
 
-- Hospedagem: Vercel ou Cloudflare Pages (decidir na Etapa 6).
+- Hospedagem: proposta em D-018 (Cloudflare Pages), aguardando aprovação.
 - Cancelamento e remarcação pelo próprio cliente (hoje só pelo estabelecimento).
 - Política de retenção e exclusão de dados (LGPD).
-- Playwright (testes de ponta a ponta): decidir quando o fluxo central estiver pronto.
+- Playwright como suíte de ponta a ponta no repositório (ver D-017).
 - Componente de menu suspenso: criar quando uma tela precisar.
 - Busca e paginação de clientes no servidor quando a lista crescer.
 

@@ -46,6 +46,29 @@ textarea {
   outline-offset: 2px;
 }
 
+/* Destino do "pular para o conteúdo": recebe foco sem desenhar contorno. */
+main:focus {
+  outline: none;
+}
+
+/* Primeiro item ao apertar Tab: pula direto para o conteúdo principal. */
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: var(--weight-semibold);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
 /* Esconde visualmente mas mantém para leitores de tela. */
 .visually-hidden {
   position: absolute;
