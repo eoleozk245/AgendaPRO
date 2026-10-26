@@ -1,0 +1,23 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.search {
+  position: relative;
+  max-width: 420px;
+}
+
+/* O ícone fica dentro do campo; o padding abre espaço para ele. */
+.search input {
+  padding-left: var(--space-10);
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  bottom: 13px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}

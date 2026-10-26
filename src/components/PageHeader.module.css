@@ -1,0 +1,39 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.description {
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--text-xl);
+  }
+
+  .action {
+    width: 100%;
+  }
+
+  .action > * {
+    width: 100%;
+  }
+}

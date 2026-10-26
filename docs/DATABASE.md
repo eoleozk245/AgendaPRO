@@ -25,9 +25,10 @@ Projeto Supabase: `AgendaPRO` (ref `xlafrbbugxypjuuadszg`, região `sa-east-1`).
 
 ## Migrações aplicadas
 
-| Arquivo                                            | Aplicada no projeto                |
-| -------------------------------------------------- | ---------------------------------- |
-| `20261026060000_organizations_and_memberships.sql` | Sim (26/10/2026, via Supabase MCP) |
+| Arquivo                                                   | Aplicada no projeto                                                                                                    |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `20261026060000_organizations_and_memberships.sql`        | Sim (26/10/2026, via Supabase MCP)                                                                                     |
+| `20261026080000_services_professionals_hours_clients.sql` | **Não.** A ferramenta pediu confirmação do dono e ficou sem resposta. Testada no PostgreSQL local (`npm run test:db`). |
 
 O Supabase registra cada migração com o horário em que foi aplicada, então o número de versão no painel pode ser diferente do nome do arquivo. O conteúdo é o mesmo.
 
@@ -35,7 +36,8 @@ O Supabase registra cada migração com o horário em que foi aplicada, então o
 
 Ficam em `supabase/tests/`. Cada arquivo roda dentro de uma transação desfeita no final (`rollback`), então nada fica gravado.
 
-- **Local** (precisa do Docker e da Supabase CLI): `supabase start` e depois `supabase test db`.
+- **Local, sem Docker:** `npm run test:db`. Sobe um PostgreSQL temporário, carrega uma imitação mínima do Supabase (`supabase/tests/support/supabase_stub.sql`: papéis `anon`/`authenticated`, `auth.users`, `auth.uid()` e as permissões padrão), aplica todas as migrações e roda os testes. Precisa de PostgreSQL 15+ e pgTAP instalados.
+- **Local com a Supabase CLI** (precisa do Docker): `supabase start` e depois `supabase test db`.
 - **Projeto remoto:** o conteúdo do arquivo pode ser executado no SQL Editor do painel. Para ver todos os resultados numa resposta só, as saídas foram juntadas numa tabela temporária (foi assim que rodei nesta sessão).
 
 Resultados da última execução estão em `docs/STATUS.md`.

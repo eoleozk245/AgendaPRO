@@ -61,3 +61,13 @@
   font-weight: var(--weight-medium);
   color: var(--color-error-text);
 }
+
+.textarea {
+  min-height: 96px;
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+select.input {
+  cursor: pointer;
+}

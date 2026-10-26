@@ -92,6 +92,18 @@
 - As funções de permissão ficam no schema `private` (não exposto pela API) e sempre usam `auth.uid()`, nunca um ID enviado pelo cliente.
 - Login com e-mail e senha (mínimo de 8 caracteres) e confirmação por e-mail.
 
+### D-014 — Painel, rotas e cadastros da Etapa 3
+
+**Confirmado (por delegação).**
+
+- **react-router** (v8) para as rotas: `/entrar`, `/painel/...` e, na Etapa 5, a página pública `/{slug}`. Um app com página pública por endereço precisa de rotas de verdade, e escrever um roteador próprio não compensa.
+- Slugs reservados no banco (`painel`, `entrar`, `api`...) para não colidirem com as rotas do app.
+- MVP com um profissional: ele nasce junto com o estabelecimento (com o nome do estabelecimento, editável em "Estabelecimento") e é ligado automaticamente a todos os serviços por trigger.
+- Horário de funcionamento por estabelecimento (não por profissional), com vários intervalos por dia e sem sobreposição (exclusion constraint).
+- Cliente: nome obrigatório, telefone (só dígitos, com DDD) e e-mail opcionais, observações opcionais com aviso para não guardar dados sensíveis. Telefone único por estabelecimento.
+- A busca de clientes filtra no navegador. Com muitos clientes vai precisar de busca e paginação no servidor (registrado como pendente).
+- No celular, as tabelas viram cartões em vez de rolar para os lados.
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -111,7 +123,8 @@
 - Política de cancelamento e reagendamento (antecedência mínima).
 - Política de retenção e exclusão de dados (LGPD).
 - Playwright (testes de ponta a ponta): decidir quando o fluxo central estiver pronto.
-- Componentes modal, menu e tabela: criar quando a primeira tela precisar deles.
+- Componente de menu suspenso: criar quando uma tela precisar.
+- Busca e paginação de clientes no servidor quando a lista crescer.
 
 ## Fora do MVP
 

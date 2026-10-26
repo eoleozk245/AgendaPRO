@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App.tsx'
 import { AuthProvider } from './features/auth/AuthProvider.tsx'
@@ -26,11 +27,22 @@ vi.mock('./features/organization/api.ts', () => ({
   createOrganization: vi.fn(),
 }))
 
-function renderApp() {
+const organization = {
+  id: 'org-1',
+  name: 'Salão Exemplo',
+  slug: 'salao-exemplo',
+  timezone: 'America/Sao_Paulo',
+  created_at: '',
+  updated_at: '',
+}
+
+function renderApp(path = '/') {
   return render(
-    <AuthProvider>
-      <App />
-    </AuthProvider>,
+    <MemoryRouter initialEntries={[path]}>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </MemoryRouter>,
   )
 }
 
@@ -42,8 +54,8 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  it('sem sessão mostra o login', () => {
-    renderApp()
+  it('sem sessão, o painel manda para o login', () => {
+    renderApp('/painel/servicos')
     expect(screen.getByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Sair' })).not.toBeInTheDocument()
   })
@@ -51,32 +63,40 @@ describe('App', () => {
   it('logado e sem estabelecimento pede o cadastro do estabelecimento', async () => {
     mocks.session = { user: { id: 'user-1' } }
     mocks.fetchMyOrganization.mockResolvedValue(null)
-    renderApp()
+    renderApp('/')
     expect(
       await screen.findByRole('heading', { name: 'Cadastre seu estabelecimento' }),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument()
   })
 
-  it('logado com estabelecimento mostra o painel', async () => {
+  it('logado com estabelecimento abre o painel com o menu', async () => {
     mocks.session = { user: { id: 'user-1' } }
-    mocks.fetchMyOrganization.mockResolvedValue({ name: 'Salão Exemplo', slug: 'salao-exemplo' })
-    renderApp()
-    expect(await screen.findByRole('heading', { name: 'Salão Exemplo' })).toBeInTheDocument()
+    mocks.fetchMyOrganization.mockResolvedValue(organization)
+    renderApp('/entrar')
+    expect(await screen.findByRole('heading', { name: 'Agenda' })).toBeInTheDocument()
+    const nav = screen.getByRole('navigation', { name: 'Painel' })
+    expect(nav).toHaveTextContent('Serviços')
+    expect(screen.getByRole('link', { name: 'Agenda' })).toHaveAttribute('aria-current', 'page')
   })
 
   it('mostra erro com opção de tentar de novo quando o carregamento falha', async () => {
     mocks.session = { user: { id: 'user-1' } }
     mocks.fetchMyOrganization.mockRejectedValueOnce(new Error('rede')).mockResolvedValue(null)
-    renderApp()
+    renderApp('/painel')
     fireEvent.click(await screen.findByRole('button', { name: 'Tentar de novo' }))
     expect(
       await screen.findByRole('heading', { name: 'Cadastre seu estabelecimento' }),
     ).toBeInTheDocument()
   })
 
+  it('endereço desconhecido mostra página não encontrada', () => {
+    renderApp('/painel-que-nao-existe/x')
+    expect(screen.getByText('Página não encontrada')).toBeInTheDocument()
+  })
+
   it('troca o tema manualmente e salva a preferência', () => {
-    renderApp()
+    renderApp('/entrar')
     fireEvent.click(screen.getByRole('radio', { name: 'Escuro' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark')
@@ -87,7 +107,7 @@ describe('App', () => {
 
   it('começa com a preferência de tema salva', () => {
     localStorage.setItem(THEME_STORAGE_KEY, 'dark')
-    renderApp()
+    renderApp('/entrar')
     expect(screen.getByRole('radio', { name: 'Escuro' })).toBeChecked()
     expect(document.documentElement.dataset.theme).toBe('dark')
   })

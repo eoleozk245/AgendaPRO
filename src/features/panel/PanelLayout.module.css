@@ -1,0 +1,97 @@
+.layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--space-8);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-12);
+}
+
+.nav {
+  min-width: 0;
+  position: sticky;
+  top: var(--space-6);
+  align-self: start;
+}
+
+.orgName {
+  margin-bottom: var(--space-3);
+  padding: 0 var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.link:hover {
+  background: var(--color-hover-overlay);
+  color: var(--color-text);
+}
+
+/* Página atual: fundo, cor, peso e barra lateral. Não depende só da cor. */
+.active {
+  background: var(--color-surface);
+  box-shadow:
+    inset 3px 0 0 var(--color-primary),
+    var(--shadow-sm);
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+
+.content {
+  min-width: 0;
+}
+
+/* Telas menores: o menu vira uma faixa horizontal que rola. */
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-4) var(--space-10);
+  }
+
+  .nav {
+    position: static;
+    margin: 0 calc(-1 * var(--space-4));
+    padding: 0 var(--space-4);
+    overflow-x: auto;
+  }
+
+  .orgName {
+    display: none;
+  }
+
+  .list {
+    flex-direction: row;
+  }
+
+  .active {
+    box-shadow:
+      inset 0 -3px 0 var(--color-primary),
+      var(--shadow-sm);
+  }
+}
