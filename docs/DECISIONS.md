@@ -2,54 +2,78 @@
 
 Última atualização: 26/10/2026
 
-**Como ler este arquivo:** as decisões abaixo marcadas como *Confirmado* foram aprovadas pelo Léo. As D-002 a D-005 foram **decididas por delegação** (ele pediu para escolher o que fosse melhor, seguindo as instruções do projeto) e podem ser revistas a qualquer momento. Nada aqui está implementado ainda: este arquivo registra decisões, não código pronto.
+**Como ler este arquivo:** as decisões abaixo marcadas como _Confirmado_ foram aprovadas pelo Léo. As D-002 a D-005 foram **decididas por delegação** (ele pediu para escolher o que fosse melhor, seguindo as instruções do projeto) e podem ser revistas a qualquer momento. Nada aqui está implementado ainda: este arquivo registra decisões, não código pronto.
 
 ## Decisões
 
 ### D-001 — Nome do produto
+
 **Confirmado.** O nome oficial é **AgendaPRO**, com essa grafia.
 
 ### D-002 — Stack
+
 **Confirmado (por delegação).** React + TypeScript + Vite no frontend, Supabase (PostgreSQL, Auth, RLS) no backend, Zod para validação, Vitest + React Testing Library para testes.
-- *Por quê:* agenda tem muito estado (calendário, formulários, permissões) e fica difícil de manter em JavaScript puro. Migrar depois custaria caro.
-- *Custo:* curva de aprendizado maior no começo, compensada por trabalhar em etapas pequenas.
+
+- _Por quê:_ agenda tem muito estado (calendário, formulários, permissões) e fica difícil de manter em JavaScript puro. Migrar depois custaria caro.
+- _Custo:_ curva de aprendizado maior no começo, compensada por trabalhar em etapas pequenas.
 
 ### D-003 — Multi-tenant
+
 **Confirmado (por delegação).** O banco nasce preparado para vários estabelecimentos (`organization_id` + RLS), mas o MVP roda com **um** estabelecimento.
-- *Por quê:* custa pouco agora e é caro de adicionar depois.
-- *Risco:* RLS mal feita é o maior risco do projeto. Por isso entra cedo, com teste de isolamento entre estabelecimentos.
+
+- _Por quê:_ custa pouco agora e é caro de adicionar depois.
+- _Risco:_ RLS mal feita é o maior risco do projeto. Por isso entra cedo, com teste de isolamento entre estabelecimentos.
 
 ### D-004 — Público-alvo do MVP
+
 **Confirmado (por delegação).** Barbearias e salões. Serviço + duração + profissional encaixa bem nesse tipo de negócio.
 
 ### D-005 — Objetivo
+
 **Confirmado (por delegação).** Portfólio com qualidade de uso real. Antes de ter qualquer cliente real, tratar LGPD (dados pessoais, retenção, exclusão).
 
 ### D-006 — Identidade visual
+
 **Confirmado** (definida nas instruções do projeto). SaaS premium, minimalista, tema claro e escuro, azul elétrico `#2563EB` e azul-marinho `#0B1F3A`. A paleta completa está no `CLAUDE.md` e pode ser ajustada após testes de contraste.
 
 ### D-007 — Datas e dinheiro
+
 **Proposta aceita junto com o resto do plano.**
+
 - Datas em `timestamptz` (UTC); o fuso do estabelecimento fica na organização (inicialmente `America/Sao_Paulo`).
 - Valores em centavos (inteiro).
 - O agendamento guarda cópia do preço e da duração do momento da reserva.
 
 ### D-008 — Prevenção de conflitos
+
 **Proposta aceita junto com o resto do plano.** Exclusion constraint do PostgreSQL por profissional, ignorando agendamentos cancelados (requer a extensão `btree_gist`). Se dois clientes reservarem ao mesmo tempo, o banco recusa o segundo. A reserva pública passa por uma função no banco; os horários livres vêm de outra função; o público nunca grava direto nas tabelas.
 
 ### D-009 — Estados do agendamento
+
 **Proposta aceita junto com o resto do plano.**
+
 - `pending → confirmed → completed`
 - `cancelled` sai de `pending` ou `confirmed`
 - `no_show` só sai de `confirmed`
 - Qualquer outra transição é inválida.
 
 ### D-010 — Repositório
+
 **Confirmado.** GitHub, conta `eoleozk245`, repositório **privado** `AgendaPRO`, branch `main`.
+
+### D-011 — Ferramentas da fundação
+
+**Confirmado (por delegação).** Projeto criado com o modelo `react-ts` do `create-vite` 9.3.1 (React 19, Vite 8, TypeScript 6 em modo `strict`), Node 22 ou superior.
+
+- O modelo atual do Vite vem com **oxlint** no lugar do ESLint. Troquei por **ESLint** porque é o que a stack confirmada (D-002) pede e tem mais documentação e plugins para React.
+- Prettier cuida da formatação, e o `eslint-config-prettier` desliga as regras de estilo do ESLint para os dois não brigarem.
+- Vitest roda os testes com `jsdom` (um navegador simulado) e Testing Library.
+- A regra `no-explicit-any` fica como erro, seguindo o `CLAUDE.md`.
 
 ## Escopo do MVP
 
 **Dentro:**
+
 - Login do dono e cadastro do estabelecimento
 - Serviços (preço e duração) e horário de funcionamento
 - Agenda por dia e semana: criar, reagendar e cancelar
