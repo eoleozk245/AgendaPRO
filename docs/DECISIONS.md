@@ -81,6 +81,17 @@
 - Fonte Inter servida pelo próprio site (`@fontsource-variable/inter`), sem chamada ao Google Fonts: é mais rápido e não envia dados do visitante a terceiros. Ícones `lucide-react`.
 - _Atenção futura:_ quando houver uma Content Security Policy, o script inline do tema vai precisar de um hash liberado.
 
+### D-013 — Estabelecimento, vínculos e endereço público
+
+**Confirmado (por delegação).**
+
+- Projeto Supabase `AgendaPRO` na região São Paulo (`sa-east-1`), plano gratuito (escolha do Léo: opção A).
+- **Slug** (endereço público `/{slug}`): letras minúsculas sem acento, números e hífens simples, de 3 a 40 caracteres e único. A tela sugere o slug a partir do nome. Ele **não pode ser alterado pela API** depois de criado, para não quebrar links já divulgados.
+- No MVP cada usuário participa de **um** estabelecimento, e o único papel é `owner`. Novos papéis entram junto com a tela de equipe.
+- O estabelecimento é criado pela função `create_organization`, que cria o estabelecimento e o vínculo de dono na mesma transação. Ninguém insere direto nas tabelas.
+- As funções de permissão ficam no schema `private` (não exposto pela API) e sempre usam `auth.uid()`, nunca um ID enviado pelo cliente.
+- Login com e-mail e senha (mínimo de 8 caracteres) e confirmação por e-mail.
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -99,7 +110,6 @@
 - Hospedagem: Vercel ou Cloudflare Pages (decidir na Etapa 6).
 - Política de cancelamento e reagendamento (antecedência mínima).
 - Política de retenção e exclusão de dados (LGPD).
-- Formato do `slug` público e como evitar colisões.
 - Playwright (testes de ponta a ponta): decidir quando o fluxo central estiver pronto.
 - Componentes modal, menu e tabela: criar quando a primeira tela precisar deles.
 

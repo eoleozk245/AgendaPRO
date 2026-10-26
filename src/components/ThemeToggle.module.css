@@ -46,6 +46,10 @@
 
 /* Em telas estreitas mostra só o ícone; o texto continua para leitores de tela. */
 @media (max-width: 480px) {
+  .face {
+    padding: 0 var(--space-2);
+  }
+
   .label {
     position: absolute;
     width: 1px;

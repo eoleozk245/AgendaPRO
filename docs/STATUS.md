@@ -2,29 +2,29 @@
 
 Última atualização: 26/10/2026
 
-## Etapa atual: 1 — Fundação (pronta para revisão)
+## Etapas
 
-| Item                                                            | Situação                     |
-| --------------------------------------------------------------- | ---------------------------- |
-| Repositório e documentação base                                 | Feito                        |
-| Projeto Vite + React + TypeScript, ESLint, Prettier, Vitest     | Feito                        |
-| Tokens de design claro e escuro, com teste de contraste         | Feito                        |
-| Troca de tema (Sistema, Claro, Escuro) com preferência salva    | Feito                        |
-| Componentes: Button, TextField, Alert, Badge, Card, ThemeToggle | Feito                        |
-| Componentes: modal, menu, tabela                                | Adiado até uma tela precisar |
+| Etapa                                          | Situação                                                   |
+| ---------------------------------------------- | ---------------------------------------------------------- |
+| 1. Fundação                                    | Feita                                                      |
+| 2. Autenticação, organização, RLS e isolamento | Feita (com ajustes de painel pendentes, ver `SECURITY.md`) |
+| 3. Serviços, horários e clientes               | A fazer                                                    |
+| 4. Agenda, conflitos e estados                 | A fazer                                                    |
+| 5. Página pública de agendamento               | A fazer                                                    |
+| 6. Acessibilidade, testes finais e publicação  | A fazer                                                    |
 
 ## O que existe de fato
 
-- Uma página temporária, "Fundação visual" (`src/features/design-preview/`), que mostra os componentes com dados de exemplo. Ela sai quando as telas reais existirem.
-- Ainda não tem Supabase, autenticação, banco, migrações nem telas do produto.
+- Login, cadastro (com confirmação por e-mail) e saída.
+- Cadastro do estabelecimento (nome + endereço público), com um painel inicial provisório.
+- Banco: `organizations` e `memberships`, com RLS (ver `DATABASE.md`).
+- Design system: tokens claro/escuro, troca de tema e componentes base.
 
 ## Verificações da última mudança
 
 - `typecheck`, `lint`, `format:check` e `build`: sem erros.
-- `npm test`: 75 testes passando (56 deles são de contraste).
-- Conferência manual com Playwright em Chromium (desktop e celular, temas claro e escuro): axe-core sem violações, sem rolagem horizontal, troca de tema por teclado e preferência mantida ao recarregar.
-- Ainda não existe CI no GitHub.
-
-## Próximo passo (Etapa 2)
-
-Autenticação, organização, RLS e testes de isolamento. Antes, precisa decidir onde o Supabase vai rodar: um projeto na nuvem (plano gratuito) e/ou o Supabase local com Docker para desenvolvimento.
+- `npm test`: todos os testes passando (o número exato está no último commit/PR).
+- pgTAP `organizations_isolation.test.sql` no projeto remoto: **16/16 ok**.
+- Supabase Advisor: um aviso de segurança, aceito e explicado em `SECURITY.md`. Nenhum aviso de desempenho.
+- Fluxo de ponta a ponta com Playwright contra o Supabase real (celular, tema escuro): senha errada mostra mensagem, login, criação do estabelecimento, recarregar mantém a sessão, saída. axe-core sem violações nas três telas, sem rolagem horizontal em 320 e 390 px.
+- **Não verificado:** o envio real do e-mail de confirmação (o teste usou um usuário já confirmado).
