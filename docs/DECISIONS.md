@@ -70,6 +70,17 @@
 - Vitest roda os testes com `jsdom` (um navegador simulado) e Testing Library.
 - A regra `no-explicit-any` fica como erro, seguindo o `CLAUDE.md`.
 
+### D-012 — Tokens de design e tema
+
+**Confirmado (por delegação).**
+
+- Tokens em variáveis CSS (`src/styles/tokens.css`), com CSS Modules nos componentes. Nada de biblioteca de UI ou de CSS extra.
+- O tema é marcado com `data-theme` no `<html>`. A preferência (Sistema, Claro ou Escuro) fica salva no `localStorage`, e um script pequeno no `index.html` aplica o tema antes da primeira pintura para a tela não piscar.
+- O contraste das cores é conferido por teste automático (WCAG AA: 4,5:1 para texto e 3:1 para bordas, foco e limites de componentes) nos dois temas.
+- O verde `#16A34A` da paleta tem só 3,3:1 sobre branco. Por isso ele fica em ícones e bordas, e o **texto** de sucesso usa `#15803D`.
+- Fonte Inter servida pelo próprio site (`@fontsource-variable/inter`), sem chamada ao Google Fonts: é mais rápido e não envia dados do visitante a terceiros. Ícones `lucide-react`.
+- _Atenção futura:_ quando houver uma Content Security Policy, o script inline do tema vai precisar de um hash liberado.
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -90,6 +101,7 @@
 - Política de retenção e exclusão de dados (LGPD).
 - Formato do `slug` público e como evitar colisões.
 - Playwright (testes de ponta a ponta): decidir quando o fluxo central estiver pronto.
+- Componentes modal, menu e tabela: criar quando a primeira tela precisar deles.
 
 ## Fora do MVP
 
