@@ -1,6 +1,6 @@
 # AgendaPRO — Registro de decisões
 
-Última atualização: 26/10/2026
+Última atualização: 27/10/2026
 
 **Como ler este arquivo:** as decisões marcadas como _Confirmado_ foram aprovadas pelo Léo. As marcadas **por delegação** foram tomadas pelo Claude porque o Léo pediu para escolher o que fosse melhor (D-002 a D-005) ou para tocar todas as fases em modo automático (D-011 em diante). Todas podem ser revistas. _Proposta_ ainda precisa de aprovação. O que já está implementado aparece em `STATUS.md`.
 
@@ -162,6 +162,18 @@
 - **Antes de clientes reais:** política de privacidade pública com link na página `/{slug}`; termo de uso com o estabelecimento (papéis de controlador e operador); canal de contato para pedidos de titulares; registro e procedimento de incidentes.
 - **Implementação futura sugerida:** job periódico de anonimização, exportação dos dados de um cliente (portabilidade e acesso) e limpeza das observações de agendamentos de clientes apagados.
 
+### D-020 — Equipe (vários profissionais)
+
+**Escopo confirmado pelo Léo (27/10/2026: "Equipe" é o primeiro item da Etapa 7). Detalhes por delegação.** Atualiza D-014, que começava com um profissional só.
+
+- **Página Equipe** (`/painel/equipe`): cadastrar, editar, desativar e excluir profissionais, e escolher quais serviços cada um faz. O nome do profissional saiu da tela "Estabelecimento".
+- **Regra no banco** (trigger do agendamento): ao criar, ou ao trocar o profissional ou o serviço, o profissional precisa estar **ativo** e **fazer o serviço**. Mudar só a situação (por exemplo, cancelar o que estava marcado com alguém desativado) continua permitido. A página pública já seguia essa regra; agora o painel também.
+- **Serviços de um profissional** são trocados pela função `set_professional_services`, com a lista inteira numa transação só. Ela roda com as permissões de quem chama (a RLS vale) e ignora IDs de serviços de outro estabelecimento.
+- **Desativar em vez de excluir:** profissional com agendamentos não pode ser excluído (o banco recusa); a tela orienta a desativar. Inativo some da página pública e dos novos agendamentos, mas continua na agenda para consulta.
+- **A agenda mostra um profissional por vez**, escolhido num seletor que só aparece quando há mais de um. Mantém a grade própria (D-015) simples. Várias colunas lado a lado ficam para quando houver necessidade.
+- Novo profissional começa fazendo todos os serviços ativos (o formulário já vem com eles marcados).
+- **Fora desta etapa:** login próprio para cada profissional (papel de funcionário), horário de trabalho por profissional (hoje o horário é do estabelecimento) e comissões.
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -193,3 +205,4 @@ Administração global da plataforma, cancelamento pelo cliente na página públ
 4. Agenda, conflitos e estados
 5. Página pública de agendamento
 6. Acessibilidade, testes finais e deploy
+7. Evolução, uma por vez e em PRs separados (ordem escolhida pelo Léo em 27/10/2026): equipe (D-020), cancelamento e remarcação pelo cliente, e-mails e lembretes
