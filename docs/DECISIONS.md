@@ -184,6 +184,17 @@
 - **Proposta (precisa do Léo):** escolher os profissionais no próprio formulário do serviço quando houver mais de um.
 - **Fora desta etapa:** login próprio para cada profissional (papel de funcionário), horário de trabalho por profissional (hoje o horário é do estabelecimento) e comissões.
 
+### D-021 — Visual com vidro (glassmorphism)
+
+**Confirmado pelo Léo (27/10/2026): "vidro em quase tudo".** Muda a identidade visual do CLAUDE.md, que antes dizia "minimalista, sem excesso de efeitos".
+
+- **Onde tem vidro** (translúcido com desfoque): cabeçalho, menu do painel, cartões, tabelas, agenda (dia e semana), modais (com o fundo desfocado), estado vazio, troca de tema, cabeçalho e cartões da página pública. Botões secundários e as linhas de tabela no celular ficam translúcidos **sem** desfoque, porque são muitos e pesariam no celular.
+- **Onde continua sólido:** campos de formulário, alertas, selos de situação e os próprios agendamentos dentro da agenda, para leitura rápida.
+- **Fundo:** manchas suaves da marca (azul, celeste e índigo) atrás do vidro, fixas na tela.
+- **Contraste garantido por teste** (`src/styles/tokens.test.ts`), no pior ponto do fundo e nos dois temas. Para passar, o verde de texto de sucesso e a borda dos campos do tema claro ficaram um tom mais escuros. No escuro, o vidro usa a cor do fundo, porque com a cor da superfície o botão azul perdia contraste.
+- **Sem desfoque ou com "reduzir transparência":** as superfícies voltam a ser sólidas.
+- **Custo conhecido:** o desfoque usa mais a placa de vídeo. Por isso há poucas camadas de vidro por tela e nenhuma em listas longas.
+
 ## Escopo do MVP
 
 **Dentro:**

@@ -1,9 +1,12 @@
 /* Tabela compartilhada: rola na horizontal em telas estreitas sem quebrar a página. */
 .wrapper {
   overflow-x: auto;
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 .table {
@@ -15,7 +18,7 @@
 .table th {
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface-muted);
+  background: var(--color-hover-overlay);
   color: var(--color-text-secondary);
   font-weight: var(--weight-semibold);
   text-align: left;
@@ -58,6 +61,9 @@
     overflow: visible;
     border: 0;
     background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   .table thead {
@@ -78,9 +84,11 @@
   .table tr {
     margin-bottom: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    border: 1px solid var(--color-border);
+    /* Cartões translúcidos sem desfoque: listas longas pesariam no celular. */
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
-    background: var(--color-surface);
+    background: var(--glass-bg-strong);
+    box-shadow: var(--glass-shadow);
   }
 
   .table td {

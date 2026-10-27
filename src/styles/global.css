@@ -28,6 +28,16 @@ p {
   margin: 0;
 }
 
+/* Fundo com manchas suaves da marca, atrás do vidro (D-021). Fica parado na tela. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--backdrop-image);
+  pointer-events: none;
+}
+
 a {
   color: var(--color-link);
 }

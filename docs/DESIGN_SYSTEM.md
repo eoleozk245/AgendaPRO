@@ -14,6 +14,13 @@ O contraste é conferido automaticamente em `src/styles/tokens.test.ts` (WCAG AA
 
 O tema escuro foi revisado à parte: superfícies sobem de tom em vez de usar sombra, o texto não é branco puro e os tons de feedback são mais claros.
 
+## Vidro (D-021)
+
+- Tokens: `--glass-bg` (padrão), `--glass-bg-strong` (conteúdo denso: tabelas, agenda, modais), `--glass-border`, `--glass-shadow`, `--glass-filter` (desfoque) e `--backdrop-image` (manchas do fundo, em `body::before`).
+- Use sempre os tokens: em navegador sem desfoque ou com "reduzir transparência", eles viram a superfície sólida e a borda comum.
+- Desfoque só em contêineres (cartão, tabela, dia da agenda, modal, menu). Itens repetidos (linhas, botões) ficam só translúcidos.
+- Texto, link, erro, sucesso, borda de campo, foco e botão principal são testados sobre o vidro no pior ponto do fundo, nos dois temas.
+
 ## Tema
 
 Sistema, Claro ou Escuro, com a preferência salva no navegador. Um script no `index.html` aplica o tema antes da primeira pintura (liberado no CSP por hash).

@@ -81,3 +81,66 @@ describe.each(Object.entries(themes))('tokens do tema %s', (_name, tokens) => {
     expect(contrast(foreground, background)).toBeGreaterThanOrEqual(minimum)
   })
 })
+
+// Vidro (D-021): o texto fica sobre uma cor que é a mistura do vidro com o
+// fundo. Confere no pior caso: as três manchas do fundo somadas no mesmo ponto
+// (mais escuras no tema claro, mais claras no escuro) e o vidro por cima.
+
+type Rgba = [r: number, g: number, b: number, alpha: number]
+
+function readRgba(selector: string): Record<string, Rgba> {
+  const start = css.indexOf(`${selector} {`)
+  const body = css.slice(start, css.indexOf('}', start))
+  const tokens: Record<string, Rgba> = {}
+  for (const match of body.matchAll(/--([\w-]+):\s*rgb\((\d+) (\d+) (\d+) \/ (\d+)%\)\s*;/g)) {
+    const [, name, r, g, b, alpha] = match
+    tokens[name] = [Number(r), Number(g), Number(b), Number(alpha) / 100]
+  }
+  return tokens
+}
+
+function blend([r, g, b, alpha]: Rgba, under: string): string {
+  const value = Number.parseInt(under.slice(1), 16)
+  const base = [value >> 16, (value >> 8) & 255, value & 255]
+  const mixed = [r, g, b].map((channel, i) => Math.round(channel * alpha + base[i] * (1 - alpha)))
+  return `#${mixed.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`
+}
+
+const lightGlass = readRgba(':root')
+const glassThemes = {
+  claro: { colors: themes.claro, glass: lightGlass },
+  escuro: {
+    colors: themes.escuro,
+    glass: { ...lightGlass, ...readRgba(":root[data-theme='dark']") },
+  },
+}
+
+const onGlass: [foreground: string, minimum: number][] = [
+  ['text', TEXT],
+  ['text-secondary', TEXT],
+  ['link', TEXT],
+  ['error-text', TEXT],
+  ['success-text', TEXT],
+  ['border-input', UI],
+  ['focus', UI],
+  ['primary', UI],
+]
+
+describe.each(Object.entries(glassThemes))('vidro do tema %s', (_name, { colors, glass }) => {
+  const backdrop = ['backdrop-1', 'backdrop-2', 'backdrop-3'].reduce(
+    (under, name) => blend(glass[name], under),
+    colors.bg,
+  )
+
+  it.each(['glass-bg', 'glass-bg-strong'])('%s existe com transparência', (layer) => {
+    expect(glass[layer], `token --${layer} ausente`).toBeDefined()
+    expect(glass[layer][3]).toBeLessThan(1)
+  })
+
+  describe.each(['glass-bg', 'glass-bg-strong'])('sobre %s', (layer) => {
+    it.each(onGlass)('%s tem contraste mínimo de %s:1', (fg, minimum) => {
+      const surface = blend(glass[layer], backdrop)
+      expect(contrast(colors[fg], surface)).toBeGreaterThanOrEqual(minimum)
+    })
+  })
+})

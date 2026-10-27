@@ -41,7 +41,7 @@
 }
 
 .secondary {
-  background: var(--color-surface);
+  background: var(--glass-bg-strong);
   border-color: var(--color-border-input);
   color: var(--color-text);
 }

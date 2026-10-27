@@ -24,7 +24,7 @@
 
   /* Bordas e campos */
   --color-border: #d6deeb;
-  --color-border-input: #7c8ba3;
+  --color-border-input: #6b7a93;
   --color-input-bg: #ffffff;
   --color-input-disabled-bg: #eef2f9;
 
@@ -43,7 +43,7 @@
 
   /* Feedback: texto, fundo e borda de cada tom */
   --color-success: #16a34a;
-  --color-success-text: #15803d;
+  --color-success-text: #166534;
   --color-success-bg: #ecfdf3;
   --color-success-border: #86efac;
   --color-error: #dc2626;
@@ -62,6 +62,27 @@
 
   --shadow-sm: 0 1px 2px rgb(11 31 58 / 6%);
   --shadow-md: 0 4px 16px rgb(11 31 58 / 8%);
+
+  /*
+   * Vidro (D-021): superfícies translúcidas com desfoque sobre um fundo com
+   * manchas suaves da marca. "strong" é para conteúdo denso (tabelas, agenda,
+   * modais), que precisa de mais opacidade para ser lido rápido. O contraste
+   * do texto sobre o vidro é conferido em tokens.test.ts no pior ponto do fundo.
+   */
+  --glass-bg: rgb(255 255 255 / 62%);
+  --glass-bg-strong: rgb(255 255 255 / 80%);
+  --glass-border: rgb(255 255 255 / 70%);
+  --glass-shadow:
+    0 1px 2px rgb(11 31 58 / 6%), 0 10px 30px rgb(11 31 58 / 8%),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
+  --glass-filter: blur(18px) saturate(160%);
+  --backdrop-1: rgb(37 99 235 / 20%);
+  --backdrop-2: rgb(14 165 233 / 14%);
+  --backdrop-3: rgb(99 102 241 / 14%);
+  --backdrop-image:
+    radial-gradient(48rem 32rem at 6% -8%, var(--backdrop-1), transparent 70%),
+    radial-gradient(40rem 28rem at 100% 10%, var(--backdrop-2), transparent 70%),
+    radial-gradient(44rem 30rem at 55% 108%, var(--backdrop-3), transparent 70%);
 
   /* Espaçamento (múltiplos de 4px) */
   --space-1: 4px;
@@ -162,4 +183,38 @@
 
   --shadow-sm: none;
   --shadow-md: 0 4px 16px rgb(0 0 0 / 35%);
+
+  /* Vidro na cor do fundo: na cor da superfície, o brilho azul atrás clareava
+     o vidro e o botão principal perdia contraste. */
+  --glass-bg: rgb(17 24 39 / 68%);
+  --glass-bg-strong: rgb(17 24 39 / 82%);
+  --glass-border: rgb(255 255 255 / 10%);
+  --glass-shadow: 0 10px 30px rgb(0 0 0 / 35%), inset 0 1px 0 rgb(255 255 255 / 6%);
+  --backdrop-1: rgb(37 99 235 / 20%);
+  --backdrop-2: rgb(14 165 233 / 8%);
+  --backdrop-3: rgb(99 102 241 / 14%);
+}
+
+/*
+ * Sem desfoque (navegador antigo) ou com "reduzir transparência" ligado no
+ * sistema: as superfícies voltam a ser sólidas, com o mesmo contraste de antes.
+ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root,
+  :root[data-theme='dark'] {
+    --glass-bg: var(--color-surface);
+    --glass-bg-strong: var(--color-surface);
+    --glass-border: var(--color-border);
+    --glass-filter: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root,
+  :root[data-theme='dark'] {
+    --glass-bg: var(--color-surface);
+    --glass-bg-strong: var(--color-surface);
+    --glass-border: var(--color-border);
+    --glass-filter: none;
+  }
 }
