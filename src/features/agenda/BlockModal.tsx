@@ -11,6 +11,8 @@ import styles from './AppointmentModal.module.css'
 type Props = {
   organizationId: string
   professionalId: string
+  /** Vai no título quando há mais de um profissional, para deixar claro de quem é a agenda. */
+  professionalName?: string
   timeZone: string
   defaultDate: string
   onClose: () => void
@@ -20,6 +22,7 @@ type Props = {
 export function BlockModal({
   organizationId,
   professionalId,
+  professionalName,
   timeZone,
   defaultDate,
   onClose,
@@ -63,7 +66,7 @@ export function BlockModal({
   return (
     <Modal
       open
-      title="Bloquear horário"
+      title={professionalName ? `Bloquear horário de ${professionalName}` : 'Bloquear horário'}
       onClose={onClose}
       footer={
         <>

@@ -37,8 +37,11 @@ type Props = {
   appointment?: AgendaAppointment
   /** Data sugerida para um novo agendamento. */
   defaultDate: string
+  /** Profissional sugerido para um novo agendamento (o que está na agenda). */
+  defaultProfessionalId: string
   onClose: () => void
-  onChanged: () => void
+  /** Ao salvar o formulário, informa onde o agendamento ficou. */
+  onChanged: (saved?: { professionalId: string; date: string }) => void
 }
 
 const ACTION_LABEL: Record<AppointmentStatus, string> = {
@@ -55,6 +58,7 @@ export function AppointmentModal({
   reference,
   appointment,
   defaultDate,
+  defaultProfessionalId,
   onClose,
   onChanged,
 }: Props) {
@@ -63,12 +67,26 @@ export function AppointmentModal({
   const professionals = reference.professionals.filter(
     (p) => p.active || p.id === appointment?.professional_id,
   )
-  const services = reference.services.filter((s) => s.active || s.id === appointment?.service_id)
 
+  /** Serviços ativos que o profissional faz (D-020), mais o atual do agendamento. */
+  function servicesFor(id: string) {
+    return reference.services.filter(
+      (s) =>
+        (s.id === appointment?.service_id && id === appointment.professional_id) ||
+        (s.active &&
+          reference.links.some((link) => link.professional_id === id && link.service_id === s.id)),
+    )
+  }
+
+  const initialProfessionalId =
+    appointment?.professional_id ??
+    (professionals.some((p) => p.id === defaultProfessionalId)
+      ? defaultProfessionalId
+      : (professionals[0]?.id ?? ''))
   const [clientId, setClientId] = useState(appointment?.client_id ?? '')
-  const [serviceId, setServiceId] = useState(appointment?.service_id ?? services[0]?.id ?? '')
-  const [professionalId, setProfessionalId] = useState(
-    appointment?.professional_id ?? professionals[0]?.id ?? '',
+  const [professionalId, setProfessionalId] = useState(initialProfessionalId)
+  const [serviceId, setServiceId] = useState(
+    appointment?.service_id ?? servicesFor(initialProfessionalId)[0]?.id ?? '',
   )
   const [date, setDate] = useState(start?.date ?? defaultDate)
   const [time, setTime] = useState(start?.time ?? '09:00')
@@ -79,7 +97,15 @@ export function AppointmentModal({
 
   const status = appointment?.status
   const final = status ? isFinal(status) : false
+  const services = servicesFor(professionalId)
   const service = services.find((s) => s.id === serviceId)
+  const professionalName = professionals.find((p) => p.id === professionalId)?.name
+
+  function changeProfessional(id: string) {
+    setProfessionalId(id)
+    const options = servicesFor(id)
+    if (!options.some((s) => s.id === serviceId)) setServiceId(options[0]?.id ?? '')
+  }
   const actions =
     appointment && status ? availableActions(status, new Date(appointment.starts_at)) : []
 
@@ -114,7 +140,7 @@ export function AppointmentModal({
     try {
       if (appointment) await updateAppointment(appointment.id, input)
       else await createAppointment(organizationId, input)
-      onChanged()
+      onChanged({ professionalId, date })
     } catch (caught) {
       setError(errorText(caught))
       setSaving(false)
@@ -136,15 +162,21 @@ export function AppointmentModal({
 
   const title = appointment ? (final ? 'Agendamento' : 'Editar agendamento') : 'Novo agendamento'
   const noClients = reference.clients.length === 0
-  const noServices = services.length === 0
+  const noServices = !reference.services.some((s) => s.active)
+  const noProfessionals = professionals.length === 0
 
-  if (!appointment && (noClients || noServices)) {
+  if (!appointment && (noClients || noServices || noProfessionals)) {
     return (
       <Modal open title={title} onClose={onClose}>
         <Alert tone="warning" title="Falta cadastro para agendar">
           {noServices && (
             <p>
               Cadastre pelo menos um serviço ativo em <Link to="/painel/servicos">Serviços</Link>.
+            </p>
+          )}
+          {noProfessionals && (
+            <p>
+              Ative pelo menos um profissional em <Link to="/painel/equipe">Equipe</Link>.
             </p>
           )}
           {noClients && (
@@ -221,31 +253,45 @@ export function AppointmentModal({
               </option>
             ))}
           </SelectField>
-          <SelectField
-            label="Serviço"
-            value={serviceId}
-            required
-            onChange={(e) => setServiceId(e.target.value)}
-          >
-            {services.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.name} · {formatDuration(option.duration_minutes)} ·{' '}
-                {formatCents(option.price_cents)}
-              </option>
-            ))}
-          </SelectField>
           {professionals.length > 1 && (
             <SelectField
               label="Profissional"
               value={professionalId}
-              onChange={(e) => setProfessionalId(e.target.value)}
+              onChange={(e) => changeProfessional(e.target.value)}
             >
               {professionals.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.name}
+                  {option.active ? option.name : `${option.name} (inativo)`}
                 </option>
               ))}
             </SelectField>
+          )}
+          {professionals.length === 1 && reference.professionals.length > 1 && (
+            <p>
+              Profissional: <strong>{professionalName}</strong>
+            </p>
+          )}
+          {services.length > 0 ? (
+            <SelectField
+              label="Serviço"
+              value={serviceId}
+              required
+              onChange={(e) => setServiceId(e.target.value)}
+            >
+              {services.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name} · {formatDuration(option.duration_minutes)} ·{' '}
+                  {formatCents(option.price_cents)}
+                </option>
+              ))}
+            </SelectField>
+          ) : (
+            <Alert
+              tone="warning"
+              title={`${professionalName ?? 'Esse profissional'} não faz nenhum serviço ativo`}
+            >
+              Escolha os serviços dessa pessoa em <Link to="/painel/equipe">Equipe</Link>.
+            </Alert>
           )}
           <div className={styles.row}>
             <TextField

@@ -33,7 +33,7 @@ React + TypeScript + Vite no frontend. Supabase (PostgreSQL, Auth, RLS) no backe
 
 ## 4. Identidade visual
 
-SaaS premium, minimalista, com cara de tecnologia e sem excesso de efeitos. Tema claro e escuro (seguindo o sistema, com troca manual e preferência salva).
+SaaS premium, com cara de tecnologia e **glassmorphism** (vidro fosco) nas superfícies, sem sacrificar leitura nem contraste (D-021). Tema claro e escuro (seguindo o sistema, com troca manual e preferência salva).
 
 | Token                     | Cor       |
 | ------------------------- | --------- |
@@ -46,7 +46,8 @@ SaaS premium, minimalista, com cara de tecnologia e sem excesso de efeitos. Tema
 | Erro                      | `#DC2626` |
 
 - Fonte: Inter ou Geist. Ícones: Lucide (nada de emoji como ícone de interface).
-- Espaçamentos em múltiplos de 4/8 px, raios de 8 a 14 px, poucos gradientes e animações discretas.
+- Espaçamentos em múltiplos de 4/8 px, raios de 8 a 14 px e animações discretas. Gradiente só no fundo (manchas suaves da marca, atrás do vidro).
+- Vidro só pelos tokens `--glass-*`, com o contraste sobre o vidro conferido em teste e versão sólida para navegador sem desfoque e para quem pede menos transparência.
 - O modo escuro **não** é o claro com fundo preto: revise contraste, superfícies e bordas separadamente.
 - Defina também cores para texto secundário, bordas, campos, foco, hover, desabilitado, aviso e informação.
 - Componentes reutilizáveis (botão, campo, menu, modal, cartão, tabela, alerta, indicador de estado).

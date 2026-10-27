@@ -21,6 +21,7 @@
 }
 
 .sm {
+  min-width: var(--control-height-sm);
   min-height: var(--control-height-sm);
   padding: 0 var(--space-3);
   font-size: var(--text-sm);
@@ -40,7 +41,7 @@
 }
 
 .secondary {
-  background: var(--color-surface);
+  background: var(--glass-bg-strong);
   border-color: var(--color-border-input);
   color: var(--color-text);
 }

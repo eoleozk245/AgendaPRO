@@ -69,7 +69,10 @@
   padding: var(--space-4) var(--space-10) var(--space-4) var(--space-4);
   border: 1px solid var(--color-border-input);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--glass-bg-strong);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 .choice:hover .choiceBody {
@@ -153,7 +156,7 @@
   padding: 0 var(--space-4);
   border: 1px solid var(--color-border-input);
   border-radius: var(--radius-sm);
-  background: var(--color-surface);
+  background: var(--glass-bg-strong);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   white-space: nowrap;

@@ -6,6 +6,9 @@
   padding: var(--space-10) var(--space-4);
   border: 1px dashed var(--color-border-input);
   border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   color: var(--color-text-secondary);
   text-align: center;
 }

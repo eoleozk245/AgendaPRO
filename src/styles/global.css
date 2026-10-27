@@ -28,6 +28,16 @@ p {
   margin: 0;
 }
 
+/* Fundo com manchas suaves da marca, atrás do vidro (D-021). Fica parado na tela. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--backdrop-image);
+  pointer-events: none;
+}
+
 a {
   color: var(--color-link);
 }
@@ -38,6 +48,17 @@ select,
 textarea {
   font: inherit;
   color: inherit;
+}
+
+/* Sem espera de duplo toque (zoom) ao tocar em controles no celular. */
+a,
+button,
+input,
+label,
+select,
+summary,
+textarea {
+  touch-action: manipulation;
 }
 
 /* Foco visível só para teclado, igual em todos os elementos interativos. */

@@ -11,6 +11,7 @@ import { PanelGate } from './features/panel/PanelGate.tsx'
 import { PanelLayout } from './features/panel/PanelLayout.tsx'
 import { PublicBookingPage } from './features/public-booking/PublicBookingPage.tsx'
 import { ServicesPage } from './features/services/ServicesPage.tsx'
+import { TeamPage } from './features/team/TeamPage.tsx'
 import { NotFoundPage } from './NotFoundPage.tsx'
 import { supabase } from './lib/supabase.ts'
 import styles from './App.module.css'
@@ -25,6 +26,7 @@ function App() {
           <Route element={<PanelLayout />}>
             <Route index element={<AgendaPage />} />
             <Route path="servicos" element={<ServicesPage />} />
+            <Route path="equipe" element={<TeamPage />} />
             <Route path="horarios" element={<BusinessHoursPage />} />
             <Route path="clientes" element={<ClientsPage />} />
             <Route path="estabelecimento" element={<SettingsPage />} />

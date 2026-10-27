@@ -59,15 +59,74 @@ test('serviços: lista e modal de novo serviço fecha com Esc', async ({ page })
   await expect(dialog).toBeHidden()
 })
 
+test('equipe: lista profissionais e a agenda troca de profissional', async ({ page }) => {
+  await page.goto('/painel/equipe')
+  await expect(page.getByRole('heading', { level: 1, name: 'Equipe' })).toBeVisible()
+  const row = page.getByRole('row', { name: /^Profissional Exemplo Corte/ })
+  await expect(row).toContainText('Corte de cabelo, Barba')
+  await expect(row).toContainText('Ativo')
+  await expect(page.getByRole('row', { name: /Profissional Exemplo Dois/ })).toContainText(
+    'Inativo',
+  )
+  await expectAccessibleLayout(page)
+
+  await page.getByRole('button', { name: 'Editar Profissional Exemplo Dois' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Editar profissional' })
+  await expect(dialog.getByRole('group', { name: 'Serviços que faz' })).toBeVisible()
+  await expectAccessibleLayout(page)
+
+  // Salvar troca a lista de serviços numa chamada só ao banco.
+  await dialog.getByLabel('Corte de cabelo').check()
+  const saved = page.waitForRequest('**/rest/v1/rpc/set_professional_services')
+  await dialog.getByRole('button', { name: 'Salvar' }).click()
+  expect((await saved).postDataJSON()).toEqual({
+    p_professional_id: 'p2',
+    p_service_ids: ['s1'],
+  })
+  await expect(dialog).toBeHidden()
+
+  await page.getByRole('link', { name: 'Agenda' }).click()
+  // Espera a agenda abrir: na Equipe, "Editar Profissional…" também casaria com o rótulo.
+  await expect(page.getByRole('heading', { level: 1, name: 'Agenda' })).toBeVisible()
+  const select = page.getByRole('combobox', { name: 'Profissional' })
+  await expect(select).toHaveValue('p1')
+  await expect(page.getByRole('button', { name: /10:00–11:00/ })).toBeVisible()
+  await select.selectOption('p2')
+  await expect(page.getByText('Nenhum agendamento neste dia.')).toBeVisible()
+})
+
 test.describe('no celular', () => {
   test.use({ viewport: { width: 390, height: 844 }, colorScheme: 'dark' })
 
-  test('agenda e serviços cabem na tela', async ({ page }) => {
+  test('agenda, serviços e equipe cabem na tela', async ({ page }) => {
     await page.goto('/painel')
     await expect(page.getByRole('button', { name: /10:00–11:00/ })).toBeVisible()
     await expectAccessibleLayout(page)
     await page.getByRole('link', { name: 'Serviços' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Serviços' })).toBeVisible()
+    await expectAccessibleLayout(page)
+    await page.getByRole('link', { name: 'Equipe' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Equipe' })).toBeVisible()
+    await expectAccessibleLayout(page)
+  })
+})
+
+test.describe('em tela de toque', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+
+  test('controles têm pelo menos 44 px e o menu mostra a página atual', async ({ page }) => {
+    await page.goto('/painel')
+    await expect(page.getByRole('button', { name: /10:00–11:00/ })).toBeVisible()
+    for (const name of ['Dia anterior', 'Hoje', 'Próximo dia']) {
+      const box = await page.getByRole('button', { name, exact: true }).boundingBox()
+      expect(box?.width, name).toBeGreaterThanOrEqual(44)
+      expect(box?.height, name).toBeGreaterThanOrEqual(44)
+    }
+
+    // "Estabelecimento" é o último item: a faixa do menu rola até ele.
+    await page.goto('/painel/estabelecimento')
+    await expect(page.getByRole('heading', { level: 1, name: 'Estabelecimento' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Estabelecimento' })).toBeInViewport({ ratio: 1 })
     await expectAccessibleLayout(page)
   })
 })

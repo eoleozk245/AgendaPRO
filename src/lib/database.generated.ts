@@ -440,6 +440,10 @@ export type Database = {
         }[]
       }
       get_public_booking_page: { Args: { p_slug: string }; Returns: Json }
+      set_professional_services: {
+        Args: { p_professional_id: string; p_service_ids: string[] }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

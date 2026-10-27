@@ -8,11 +8,18 @@ Definidos em `src/styles/tokens.css` como variáveis CSS, com um bloco para o te
 - **Espaçamento:** `--space-1` (4px) até `--space-12` (48px).
 - **Raios:** 8, 10 e 14 px.
 - **Tipografia:** Inter (servida pelo próprio site), tamanhos de `--text-xs` a `--text-2xl`.
-- **Alvos de toque:** 44 px (padrão) e 36 px (pequeno).
+- **Alvos de toque:** 44 px (padrão) e 36 px (pequeno, só com mouse). Em tela de toque (`pointer: coarse`), o pequeno também vira 44 px. Botão só de ícone tem largura mínima igual à altura. Ícone que não pode crescer (ex.: remover bloqueio na agenda) ganha área de toque invisível ao redor.
 
 O contraste é conferido automaticamente em `src/styles/tokens.test.ts` (WCAG AA) nos dois temas. Se uma cor mudar, rode `npm test`.
 
 O tema escuro foi revisado à parte: superfícies sobem de tom em vez de usar sombra, o texto não é branco puro e os tons de feedback são mais claros.
+
+## Vidro (D-021)
+
+- Tokens: `--glass-bg` (padrão), `--glass-bg-strong` (conteúdo denso: tabelas, agenda, modais), `--glass-border`, `--glass-shadow`, `--glass-filter` (desfoque) e `--backdrop-image` (manchas do fundo, em `body::before`).
+- Use sempre os tokens: em navegador sem desfoque ou com "reduzir transparência", eles viram a superfície sólida e a borda comum.
+- Desfoque só em contêineres (cartão, tabela, dia da agenda, modal, menu). Itens repetidos (linhas, botões) ficam só translúcidos.
+- Texto, link, erro, sucesso, borda de campo, foco e botão principal são testados sobre o vidro no pior ponto do fundo, nos dois temas.
 
 ## Tema
 
@@ -38,5 +45,7 @@ Sistema, Claro ou Escuro, com a preferência salva no navegador. Um script no `i
 
 - Estados nunca dependem só de cor: sempre há ícone, texto, borda ou padrão junto.
 - Foco visível em tudo (`:focus-visible`) e link "Pular para o conteúdo".
+- Formulário com erro leva o foco ao primeiro campo a corrigir (`focusFirstInvalid` em `src/lib/focus.ts`).
+- No celular, o menu do painel é uma faixa que rola para os lados e sempre mostra a página atual.
 - Toda tela tem estados de carregamento, vazio, erro (com "tentar de novo") e sucesso.
 - Animações respeitam `prefers-reduced-motion`.

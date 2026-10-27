@@ -1,6 +1,6 @@
 # AgendaPRO — Registro de decisões
 
-Última atualização: 26/10/2026
+Última atualização: 27/10/2026
 
 **Como ler este arquivo:** as decisões marcadas como _Confirmado_ foram aprovadas pelo Léo. As marcadas **por delegação** foram tomadas pelo Claude porque o Léo pediu para escolher o que fosse melhor (D-002 a D-005) ou para tocar todas as fases em modo automático (D-011 em diante). Todas podem ser revistas. _Proposta_ ainda precisa de aprovação. O que já está implementado aparece em `STATUS.md`.
 
@@ -162,6 +162,39 @@
 - **Antes de clientes reais:** política de privacidade pública com link na página `/{slug}`; termo de uso com o estabelecimento (papéis de controlador e operador); canal de contato para pedidos de titulares; registro e procedimento de incidentes.
 - **Implementação futura sugerida:** job periódico de anonimização, exportação dos dados de um cliente (portabilidade e acesso) e limpeza das observações de agendamentos de clientes apagados.
 
+### D-020 — Equipe (vários profissionais)
+
+**Escopo confirmado pelo Léo (27/10/2026: "Equipe" é o primeiro item da Etapa 7). Detalhes por delegação.** Atualiza D-014, que começava com um profissional só.
+
+- **Página Equipe** (`/painel/equipe`): cadastrar, editar, desativar e excluir profissionais, e escolher quais serviços cada um faz. O nome do profissional saiu da tela "Estabelecimento".
+- **Regra no banco** (trigger do agendamento):
+  - Ao criar, **remarcar** ou trocar o profissional ou o serviço, o profissional precisa ser do mesmo estabelecimento e estar **ativo**.
+  - Ao criar ou trocar o profissional ou o serviço, ele também precisa **fazer o serviço**.
+  - Mudar só a situação continua permitido: confirmar, cancelar ou marcar como concluído o que estava marcado com alguém desativado. Para remarcar, primeiro passe o horário para um profissional ativo.
+  - A linha do profissional fica travada até o fim da gravação. Uma desativação ou troca de serviços feita ao mesmo tempo espera, em vez de deixar passar uma reserva no meio.
+  - A página pública já seguia essa regra; agora o painel também.
+- **Só o dono grava agendamento pelo painel**, conferido no trigger antes das outras regras, para as mensagens de erro não revelarem nada de outro estabelecimento. A reserva pública e rotinas internas sem usuário passam.
+- **Serviços de um profissional** são trocados pela função `set_professional_services`, com a lista inteira numa transação só.
+  - Ela roda com as permissões de quem chama (a RLS vale).
+  - Ignora IDs de serviços de outro estabelecimento, IDs repetidos e nulos. Recusa uma lista nula.
+  - Trava o profissional: duas gravações ao mesmo tempo terminam com a última lista.
+- **Desativar em vez de excluir:** profissional com agendamentos não pode ser excluído (o banco recusa); a tela orienta a desativar. Inativo some da página pública e dos novos agendamentos, mas continua na agenda para consulta.
+- **A agenda mostra um profissional por vez**, escolhido num seletor que só aparece quando há mais de um. Mantém a grade própria (D-015) simples. Várias colunas lado a lado ficam para quando houver necessidade.
+- **Novo profissional começa fazendo todos os serviços** (o banco já ligava; o formulário vem com eles marcados). **Serviço novo continua indo para toda a equipe**, inclusive inativos (regra do MVP, mantida). O formulário de serviço avisa para ajustar em Equipe. Mudar para "ninguém faz" esconderia o serviço novo da página pública sem o dono entender por quê.
+- **Proposta (precisa do Léo):** escolher os profissionais no próprio formulário do serviço quando houver mais de um.
+- **Fora desta etapa:** login próprio para cada profissional (papel de funcionário), horário de trabalho por profissional (hoje o horário é do estabelecimento) e comissões.
+
+### D-021 — Visual com vidro (glassmorphism)
+
+**Confirmado pelo Léo (27/10/2026): "vidro em quase tudo".** Muda a identidade visual do CLAUDE.md, que antes dizia "minimalista, sem excesso de efeitos".
+
+- **Onde tem vidro** (translúcido com desfoque): cabeçalho, menu do painel, cartões, tabelas, agenda (dia e semana), modais (com o fundo desfocado), estado vazio, troca de tema, cabeçalho e cartões da página pública. Botões secundários e as linhas de tabela no celular ficam translúcidos **sem** desfoque, porque são muitos e pesariam no celular.
+- **Onde continua sólido:** campos de formulário, alertas, selos de situação e os próprios agendamentos dentro da agenda, para leitura rápida.
+- **Fundo:** manchas suaves da marca (azul, celeste e índigo) atrás do vidro, fixas na tela.
+- **Contraste garantido por teste** (`src/styles/tokens.test.ts`), no pior ponto do fundo e nos dois temas. Para passar, o verde de texto de sucesso e a borda dos campos do tema claro ficaram um tom mais escuros. No escuro, o vidro usa a cor do fundo, porque com a cor da superfície o botão azul perdia contraste.
+- **Sem desfoque ou com "reduzir transparência":** as superfícies voltam a ser sólidas.
+- **Custo conhecido:** o desfoque usa mais a placa de vídeo. Por isso há poucas camadas de vidro por tela e nenhuma em listas longas.
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -177,6 +210,7 @@
 ## Pendente
 
 - Cancelamento e remarcação pelo próprio cliente (hoje só pelo estabelecimento).
+- Escolher os profissionais no formulário do serviço (proposta em D-020).
 - Política de retenção e exclusão de dados (LGPD): proposta em D-019, aguardando aprovação.
 - Componente de menu suspenso: criar quando uma tela precisar.
 - Busca e paginação de clientes no servidor quando a lista crescer.
@@ -193,3 +227,4 @@ Administração global da plataforma, cancelamento pelo cliente na página públ
 4. Agenda, conflitos e estados
 5. Página pública de agendamento
 6. Acessibilidade, testes finais e deploy
+7. Evolução, uma por vez e em PRs separados (ordem escolhida pelo Léo em 27/10/2026): equipe (D-020), cancelamento e remarcação pelo cliente, e-mails e lembretes

@@ -53,6 +53,19 @@ const professionals = [
     created_at: now,
     updated_at: now,
   },
+  {
+    id: 'p2',
+    organization_id: 'org-1',
+    name: 'Profissional Exemplo Dois',
+    active: false,
+    created_at: now,
+    updated_at: now,
+  },
+]
+
+const professionalServices = [
+  { organization_id: 'org-1', professional_id: 'p1', service_id: 's1' },
+  { organization_id: 'org-1', professional_id: 'p1', service_id: 's2' },
 ]
 
 const clients = [
@@ -186,6 +199,7 @@ export async function mockSupabase(page: Page, options: MockOptions = {}) {
         tomorrowSlots().map((startsAt) => ({ starts_at: startsAt })),
       )
     }
+    if (path === '/rest/v1/rpc/set_professional_services') return route.fulfill({ status: 204 })
     if (path === '/rest/v1/rpc/book_appointment') {
       const [startsAt] = tomorrowSlots()
       return json(route, {
@@ -205,6 +219,7 @@ export async function mockSupabase(page: Page, options: MockOptions = {}) {
       '/rest/v1/organizations': [organization],
       '/rest/v1/services': services,
       '/rest/v1/professionals': professionals,
+      '/rest/v1/professional_services': professionalServices,
       '/rest/v1/clients': clients,
       '/rest/v1/business_hours': businessHours(),
       '/rest/v1/appointments': todaysAppointments(),

@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from 'react'
+import { focusFirstInvalid } from '../../lib/focus.ts'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
 import { Checkbox } from '../../components/Checkbox.tsx'
@@ -53,6 +54,7 @@ export function ServiceFormModal({ organizationId, service, onClose, onSaved }: 
         next[key] ??= issue.message
       }
       setErrors(next)
+      focusFirstInvalid(event.currentTarget)
       return
     }
     setErrors({})
@@ -128,6 +130,12 @@ export function ServiceFormModal({ organizationId, service, onClose, onSaved }: 
           checked={values.active}
           onChange={(event) => update('active', event.target.checked)}
         />
+        {!service && (
+          <p className={styles.note}>
+            Toda a equipe passa a fazer este serviço. Para mudar quem faz, edite cada profissional
+            em Equipe.
+          </p>
+        )}
         {formError && <Alert tone="error" title={formError} />}
       </form>
     </Modal>

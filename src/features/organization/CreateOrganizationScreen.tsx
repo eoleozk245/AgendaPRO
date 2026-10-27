@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { focusFirstInvalid } from '../../lib/focus.ts'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
 import { Card } from '../../components/Card.tsx'
@@ -25,6 +26,7 @@ export function CreateOrganizationScreen({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const form = event.currentTarget
     const parsed = organizationSchema.safeParse({ name, slug })
     if (!parsed.success) {
       const errors: FieldErrors = {}
@@ -33,6 +35,7 @@ export function CreateOrganizationScreen({
         if ((field === 'name' || field === 'slug') && !errors[field]) errors[field] = issue.message
       }
       setFieldErrors(errors)
+      focusFirstInvalid(form)
       return
     }
     setFieldErrors({})
@@ -45,8 +48,12 @@ export function CreateOrganizationScreen({
         onCreated(result.organization)
         return
       }
-      if (result.field) setFieldErrors({ [result.field]: result.message })
-      else setFormError(result.message)
+      if (result.field) {
+        setFieldErrors({ [result.field]: result.message })
+        focusFirstInvalid(form)
+      } else {
+        setFormError(result.message)
+      }
     } catch {
       setFormError('Sem conexão com o servidor. Verifique sua internet e tente de novo.')
     } finally {

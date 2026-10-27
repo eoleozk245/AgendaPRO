@@ -3,6 +3,7 @@ import type {
   BusinessHour,
   Client,
   Professional,
+  ProfessionalService,
   Service,
 } from '../../lib/database.types.ts'
 import { throwIfError } from '../../lib/db-errors.ts'
@@ -67,12 +68,14 @@ export type AgendaReference = {
   services: Service[]
   clients: Client[]
   professionals: Professional[]
+  /** Quais serviços cada profissional faz. */
+  links: Pick<ProfessionalService, 'professional_id' | 'service_id'>[]
   hours: BusinessHour[]
 }
 
 /** Dados de apoio da agenda (mudam pouco). */
 export async function loadAgendaReference(organizationId: string): Promise<AgendaReference> {
-  const [services, clients, professionals, hours] = await Promise.all([
+  const [services, clients, professionals, links, hours] = await Promise.all([
     supabase.from('services').select('*').eq('organization_id', organizationId).order('name'),
     supabase.from('clients').select('*').eq('organization_id', organizationId).order('name'),
     supabase
@@ -80,16 +83,22 @@ export async function loadAgendaReference(organizationId: string): Promise<Agend
       .select('*')
       .eq('organization_id', organizationId)
       .order('created_at'),
+    supabase
+      .from('professional_services')
+      .select('professional_id, service_id')
+      .eq('organization_id', organizationId),
     supabase.from('business_hours').select('*').eq('organization_id', organizationId),
   ])
   throwIfError(services.error)
   throwIfError(clients.error)
   throwIfError(professionals.error)
+  throwIfError(links.error)
   throwIfError(hours.error)
   return {
     services: services.data ?? [],
     clients: clients.data ?? [],
     professionals: professionals.data ?? [],
+    links: links.data ?? [],
     hours: hours.data ?? [],
   }
 }
