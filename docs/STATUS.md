@@ -13,21 +13,18 @@
 | 5. Página pública                                | Feita                     | **Não aplicada**                                     |
 | 6. Acessibilidade, testes finais, CI, publicação | Feita, menos a publicação | —                                                    |
 
-O banco real já tem as tabelas das Etapas 2 a 4. Falta só a migração da página pública: sem ela, a página `/{endereço}` mostra o estado de erro, e as regras de reserva (antecedência e dias à frente) em "Estabelecimento" não salvam.
+O banco real já tem as tabelas das Etapas 2 a 4 (conferido com `list_migrations` e consulta ao catálogo em 27/10; ver `DATABASE.md`). Falta só a migração da página pública: sem ela, a página `/{endereço}` mostra o estado de erro, e as regras de reserva (antecedência e dias à frente) em "Estabelecimento" não salvam.
 
 ## O que falta para o MVP rodar de ponta a ponta
 
-1. **Aplicar as 2 migrações pendentes**, em ordem (ver abaixo).
+1. **Aplicar a migração pendente** (ver abaixo).
 2. **Gerar de novo os tipos** (`src/lib/database.types.ts`) a partir do banco. Hoje as partes das Etapas 3 a 5 foram escritas à mão no mesmo formato.
 3. **Ajustes no painel do Supabase** (`SECURITY.md`): senha mínima de 8 caracteres e URLs de redirecionamento.
 4. **Decidir a hospedagem** (proposta D-018) e tratar a LGPD antes de clientes reais.
 
 ### Como aplicar as migrações
 
-As duas migrações pendentes estão em `supabase/migrations/` e precisam entrar nesta ordem:
-
-1. `20261026120000_public_booking.sql`
-2. `20261026130000_foreign_key_indexes.sql`
+A migração pendente está em `supabase/migrations/20261026120000_public_booking.sql`.
 
 Opções:
 
