@@ -13,6 +13,9 @@
 - As permissões vêm de `auth.uid()` (o token do usuário), nunca de um ID enviado pelo cliente.
 - Gravações sensíveis passam por funções no banco que validam tudo (ex.: `create_organization`).
 - O teste `supabase/tests/organizations_isolation.test.sql` prova que um estabelecimento não lê nem altera os dados de outro.
+- **Triggers rodam antes da RLS.** Os triggers de agendamento e de bloqueio são `security definer` e rodam antes do `with check` da RLS. Por isso eles mesmos conferem, antes de qualquer outra consulta, se quem grava é dono e se o profissional é do mesmo estabelecimento. Sem isso, a mensagem de erro podia revelar dados de outro estabelecimento.
+  - Exemplo do problema, corrigido em 27/10/2026 na migração `20261027130000_blocks_isolation.sql`: o bloqueio de agenda dizia "já existe agendamento" para o profissional de outro estabelecimento.
+  - Testes: `blocks_isolation.test.sql` e o fim de `team.test.sql`.
 
 ## Avisos conhecidos do Supabase Advisor
 

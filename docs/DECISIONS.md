@@ -167,11 +167,21 @@
 **Escopo confirmado pelo Léo (27/10/2026: "Equipe" é o primeiro item da Etapa 7). Detalhes por delegação.** Atualiza D-014, que começava com um profissional só.
 
 - **Página Equipe** (`/painel/equipe`): cadastrar, editar, desativar e excluir profissionais, e escolher quais serviços cada um faz. O nome do profissional saiu da tela "Estabelecimento".
-- **Regra no banco** (trigger do agendamento): ao criar, ou ao trocar o profissional ou o serviço, o profissional precisa estar **ativo** e **fazer o serviço**. Mudar só a situação (por exemplo, cancelar o que estava marcado com alguém desativado) continua permitido. A página pública já seguia essa regra; agora o painel também.
-- **Serviços de um profissional** são trocados pela função `set_professional_services`, com a lista inteira numa transação só. Ela roda com as permissões de quem chama (a RLS vale) e ignora IDs de serviços de outro estabelecimento.
+- **Regra no banco** (trigger do agendamento):
+  - Ao criar, **remarcar** ou trocar o profissional ou o serviço, o profissional precisa ser do mesmo estabelecimento e estar **ativo**.
+  - Ao criar ou trocar o profissional ou o serviço, ele também precisa **fazer o serviço**.
+  - Mudar só a situação continua permitido: confirmar, cancelar ou marcar como concluído o que estava marcado com alguém desativado. Para remarcar, primeiro passe o horário para um profissional ativo.
+  - A linha do profissional fica travada até o fim da gravação. Uma desativação ou troca de serviços feita ao mesmo tempo espera, em vez de deixar passar uma reserva no meio.
+  - A página pública já seguia essa regra; agora o painel também.
+- **Só o dono grava agendamento pelo painel**, conferido no trigger antes das outras regras, para as mensagens de erro não revelarem nada de outro estabelecimento. A reserva pública e rotinas internas sem usuário passam.
+- **Serviços de um profissional** são trocados pela função `set_professional_services`, com a lista inteira numa transação só.
+  - Ela roda com as permissões de quem chama (a RLS vale).
+  - Ignora IDs de serviços de outro estabelecimento, IDs repetidos e nulos. Recusa uma lista nula.
+  - Trava o profissional: duas gravações ao mesmo tempo terminam com a última lista.
 - **Desativar em vez de excluir:** profissional com agendamentos não pode ser excluído (o banco recusa); a tela orienta a desativar. Inativo some da página pública e dos novos agendamentos, mas continua na agenda para consulta.
 - **A agenda mostra um profissional por vez**, escolhido num seletor que só aparece quando há mais de um. Mantém a grade própria (D-015) simples. Várias colunas lado a lado ficam para quando houver necessidade.
-- Novo profissional começa fazendo todos os serviços ativos (o formulário já vem com eles marcados).
+- **Novo profissional começa fazendo todos os serviços** (o banco já ligava; o formulário vem com eles marcados). **Serviço novo continua indo para toda a equipe**, inclusive inativos (regra do MVP, mantida). O formulário de serviço avisa para ajustar em Equipe. Mudar para "ninguém faz" esconderia o serviço novo da página pública sem o dono entender por quê.
+- **Proposta (precisa do Léo):** escolher os profissionais no próprio formulário do serviço quando houver mais de um.
 - **Fora desta etapa:** login próprio para cada profissional (papel de funcionário), horário de trabalho por profissional (hoje o horário é do estabelecimento) e comissões.
 
 ## Escopo do MVP
@@ -189,6 +199,7 @@
 ## Pendente
 
 - Cancelamento e remarcação pelo próprio cliente (hoje só pelo estabelecimento).
+- Escolher os profissionais no formulário do serviço (proposta em D-020).
 - Política de retenção e exclusão de dados (LGPD): proposta em D-019, aguardando aprovação.
 - Componente de menu suspenso: criar quando uma tela precisar.
 - Busca e paginação de clientes no servidor quando a lista crescer.

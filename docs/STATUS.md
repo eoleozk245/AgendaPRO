@@ -12,13 +12,13 @@
 | 4. Agenda, conflitos, estados                    | Feita                                        | **Aplicada**                                         |
 | 5. Página pública                                | Feita                                        | **Aplicada** (pelo SQL Editor)                       |
 | 6. Acessibilidade, testes finais, CI, publicação | Feita; falta o Léo criar o projeto na Vercel | —                                                    |
-| 7a. Equipe (D-020)                               | Feita, em PR                                 | **Não aplicada**                                     |
+| 7a. Equipe (D-020)                               | Feita, em PR                                 | **Não aplicada** (2 migrações)                       |
 
 O banco real já tem as quatro migrações (conferido em 27/10 com `list_migrations` e consultas ao catálogo; ver `DATABASE.md`). Os tipos do TypeScript agora vêm do gerador do Supabase.
 
 ## O que falta
 
-1. **Aplicar a migração da equipe** (`20261027120000_team.sql`) no banco real e gerar os tipos de novo.
+1. **Aplicar no banco real as migrações da equipe e da correção dos bloqueios** (`20261027120000_team.sql` e `20261027130000_blocks_isolation.sql`), gerar os tipos de novo e só então juntar o PR na `main`. O painel novo chama a função `set_professional_services`, que só existe depois da migração.
 2. **Rodar no banco real os testes pgTAP da agenda e da página pública.** Nas três tentativas a ferramenta do Supabase pediu confirmação ao Léo e desistiu. Ambos passam no PostgreSQL 16 local e no CI. O de cadastros (22/22) e o de isolamento (16/16) já passaram no banco real.
 3. **Ajustes no painel do Supabase** (`SECURITY.md`): senha mínima de 8 caracteres, proteção contra senhas vazadas e URLs de redirecionamento.
 4. **Tratar a LGPD** (proposta D-019) antes de clientes reais.
@@ -27,9 +27,19 @@ O banco real já tem as quatro migrações (conferido em 27/10 com `list_migrati
 
 - **GitHub Actions verde** no PR (jobs App e Banco). A primeira execução pegou um teste com corrida de tempo, já corrigido.
 - `npm run lint`, `format:check`, `typecheck` e `build`: sem erros.
-- `npm test`: **206 testes** passando (componentes, telas, regras de negócio, contraste, fuso, dinheiro, estados, cabeçalhos de segurança, equipe).
-- `npm run test:e2e`: **14 testes Playwright** passando, com o Supabase simulado: login e senha errada, painel sem sessão, página pública (computador e celular escuro), validação, agenda do dia e da semana, detalhes do agendamento, serviços e modal com Esc, equipe e troca de profissional na agenda, páginas não encontradas. Todos passam pelo axe-core e conferem rolagem horizontal. Também roda no CI (job "E2E (Playwright)").
-- `npm run test:db`: **99 testes pgTAP** passando no PostgreSQL 16 local, com as 5 migrações (isolamento 16, cadastros 22, agenda 27, página pública 20, equipe 14). Também rodou como usuário comum, igual ao CI.
+- `npm test`: **211 testes** passando (componentes, telas, regras de negócio, contraste, fuso, dinheiro, estados, cabeçalhos de segurança, equipe, página pública com vários profissionais).
+- `npm run test:e2e`: **14 testes Playwright** passando, com o Supabase simulado: login e senha errada, painel sem sessão, página pública (computador e celular escuro), validação, agenda do dia e da semana, detalhes do agendamento, serviços e modal com Esc, equipe (incluindo salvar) e troca de profissional na agenda, páginas não encontradas. Todos passam pelo axe-core e conferem rolagem horizontal. Também roda no CI (job "E2E (Playwright)").
+- `npm run test:db`: **122 testes pgTAP** passando no PostgreSQL 16 local, com as 6 migrações (isolamento 16, cadastros 22, agenda 27, página pública 20, equipe 31, bloqueios 6). Também rodou como usuário comum, igual ao CI.
+- **Revisão da Etapa 7a com 4 subagentes** (backend, segurança, frontend e testes), em 27/10. Achados aceitos e corrigidos:
+  - um vazamento entre estabelecimentos pelos bloqueios (já existia antes da 7a);
+  - mensagens de erro que revelavam dados de outro estabelecimento;
+  - corridas de concorrência;
+  - lista com nulos na função de serviços;
+  - um profissional "fantasma" ao cancelar depois de uma falha;
+  - agendamento que "sumia" da agenda depois de salvo.
+
+  As travas de concorrência foram conferidas com duas conexões simultâneas num PostgreSQL 16 local: a reserva espera a desativação ou a troca de serviços terminar e então é recusada.
+
 - Navegador (Chromium/Playwright, scripts temporários fora do repositório):
   - Fluxo real contra o Supabase: login, senha errada, criação do estabelecimento, recarregar, sair.
   - Telas do painel, agenda e página pública com respostas simuladas: axe-core sem violações em computador (1280 px) e celular (390 e 320 px), nos temas claro e escuro, e sem rolagem horizontal.
