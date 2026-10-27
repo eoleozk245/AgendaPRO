@@ -1,9 +1,0 @@
-# Cabeçalhos de segurança para hospedagem estática (formato do Cloudflare Pages).
-# O hash em script-src é do script de tema do index.html. Se aquele script mudar,
-# o teste src/security-headers.test.ts falha e mostra o hash novo.
-/*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-QJnfqXicUMsx3cLygf0AN3/cyHZrpKeMNc7QFlOOE7E='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()

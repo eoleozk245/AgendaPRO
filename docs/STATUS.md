@@ -19,7 +19,7 @@ O banco real já tem as quatro migrações (conferido em 27/10 com `list_migrati
 
 1. **Rodar no banco real os testes pgTAP da agenda e da página pública.** Nas três tentativas a ferramenta do Supabase pediu confirmação ao Léo e desistiu. Ambos passam no PostgreSQL 16 local e no CI. O de cadastros (22/22) e o de isolamento (16/16) já passaram no banco real.
 2. **Ajustes no painel do Supabase** (`SECURITY.md`): senha mínima de 8 caracteres, proteção contra senhas vazadas e URLs de redirecionamento.
-3. **Decidir a hospedagem** (proposta D-018) e tratar a LGPD antes de clientes reais.
+3. **Tratar a LGPD** (proposta D-019) antes de clientes reais.
 
 ## Verificações feitas
 
@@ -31,7 +31,7 @@ O banco real já tem as quatro migrações (conferido em 27/10 com `list_migrati
 - Navegador (Chromium/Playwright, scripts temporários fora do repositório):
   - Fluxo real contra o Supabase: login, senha errada, criação do estabelecimento, recarregar, sair.
   - Telas do painel, agenda e página pública com respostas simuladas: axe-core sem violações em computador (1280 px) e celular (390 e 320 px), nos temas claro e escuro, e sem rolagem horizontal.
-  - Build servido com os cabeçalhos de `public/_headers`: nenhum bloqueio do CSP, tema e fonte funcionando.
+  - Build servido com os mesmos cabeçalhos de segurança (hoje em `vercel.json`): nenhum bloqueio do CSP, tema e fonte funcionando.
 - **Ponta a ponta no Supabase real** (27/10, Chromium, usuário e dados fictícios): login → criar serviço → horário de funcionamento → reserva pela página pública `/barbearia-exemplo-e2e` → agendamento aparece "Pendente" na agenda às 10:00 (fuso certo) → confirmar → o horário e os que se sobrepõem somem da página pública (35 → 32 horários livres) → tentar agendar no mesmo horário pelo painel mostra o conflito vindo do banco. axe-core sem violações na agenda e na página pública (também no celular escuro).
 - **Ponta a ponta no Supabase real, parte 2** (27/10): remarcar 10:00 → 11:00 (a página pública libera o antigo e tira o novo), concluir e "não compareceu" em horários já passados (concluído vira só leitura), cancelar com confirmação (o horário volta a ficar livre), bloquear 14:00–15:00 (some da página pública, o banco recusa agendamento às 14:15, e remover devolve os horários). axe-core sem violações na semana, no dia e no celular escuro.
 - Ficaram no banco de teste: serviço "Corte Exemplo", horário de quarta 09:00–18:00, "Cliente Exemplo E2E" e três agendamentos (28/10 11:00 cancelado; 27/10 08:00 concluído; 27/10 07:00 não compareceu). Nenhum bloqueio.

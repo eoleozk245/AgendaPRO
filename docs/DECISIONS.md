@@ -133,16 +133,18 @@
 **Confirmado (por delegação).**
 
 - **GitHub Actions** em todo PR e na `main`, com dois jobs: app (lint, formatação, tipos, testes e build) e banco (PostgreSQL 16 + pgTAP via `scripts/test-db.sh`). Necessidade concreta: o projeto já tem migrações e regras críticas que precisam ser verificadas sempre.
-- **Content Security Policy** e outros cabeçalhos em `public/_headers`. O script de tema é liberado por hash, e um teste confere se o hash bate com o `index.html`.
+- **Content Security Policy** e outros cabeçalhos em `vercel.json` (ver D-018). O script de tema é liberado por hash, e um teste confere se o hash bate com o `index.html`.
 - **Playwright** entrou (27/10) como suíte de navegador em `e2e/` (`npm run test:e2e`), com as respostas do Supabase **simuladas** por `page.route`: roda no CI sem segredos e nunca toca no banco real. Cada teste também passa pelo axe-core e confere que não há rolagem horizontal. Dependências: `@playwright/test` (mesma versão do Playwright do ambiente, 1.63.0, travada com `overrides` de `playwright-core`) e `@axe-core/playwright` (axe dentro dos testes). O teste de ponta a ponta contra o banco real continua manual.
 
 ### D-018 — Hospedagem
 
-**Proposta (precisa da aprovação do Léo).** Resolve a pendência "Vercel ou Cloudflare Pages".
+**Confirmado (decisão do Léo, 27/10/2026): Vercel.** Substitui a proposta anterior (Cloudflare Pages).
 
-- Recomendação: **Cloudflare Pages**. O plano gratuito permite uso comercial (o Hobby da Vercel não permite, e D-005 prevê uso comercial no futuro), tem CDN global e lê `public/_headers`.
-- A Vercel continua boa para portfólio, mas para vender exigiria o plano Pro (pago).
-- Nada foi publicado. Publicar expõe o produto ao público e depende da LGPD (D-005).
+- Projeto Vercel ligado ao repositório do GitHub: cada push na `main` publica em produção, e cada PR ganha uma prévia.
+- Configuração em `vercel.json`: build do Vite, todas as rotas caem no `index.html` (SPA com `/{slug}`) e os cabeçalhos de segurança (CSP, nosniff, frame-ancestors etc.). Arquivos em `/assets` ficam em cache por 1 ano (o nome muda a cada build).
+- Variáveis na Vercel: só `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` (públicas por natureza). Nenhuma chave secreta.
+- **Atenção:** o plano gratuito (Hobby) é só para uso não comercial. Para vender o AgendaPRO, migrar para o plano Pro.
+- Antes de clientes reais continua valendo a LGPD (D-005, D-019).
 
 ### D-019 — Retenção e exclusão de dados (LGPD)
 
@@ -174,7 +176,6 @@
 
 ## Pendente
 
-- Hospedagem: proposta em D-018 (Cloudflare Pages), aguardando aprovação.
 - Cancelamento e remarcação pelo próprio cliente (hoje só pelo estabelecimento).
 - Política de retenção e exclusão de dados (LGPD): proposta em D-019, aguardando aprovação.
 - Componente de menu suspenso: criar quando uma tela precisar.
