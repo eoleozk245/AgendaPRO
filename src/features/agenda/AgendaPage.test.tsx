@@ -54,6 +54,7 @@ const reference = {
       updated_at: now,
     },
   ],
+  links: [{ professional_id: 'p1', service_id: 's1' }],
   hours: [
     {
       id: 'h1',
@@ -205,6 +206,110 @@ describe('AgendaPage', () => {
     fireEvent.click(await screen.findByRole('button', { name: /10:00–10:30/ }))
     fireEvent.click(screen.getByRole('button', { name: /Marcar como concluído/ }))
     await waitFor(() => expect(api.setAppointmentStatus).toHaveBeenCalledWith('a1', 'completed'))
+  })
+
+  describe('com mais de um profissional', () => {
+    const team = {
+      ...reference,
+      services: [
+        ...reference.services,
+        { ...reference.services[0], id: 's2', name: 'Barba', duration_minutes: 20 },
+      ],
+      professionals: [
+        ...reference.professionals,
+        { ...reference.professionals[0], id: 'p2', name: 'Ana Exemplo' },
+        { ...reference.professionals[0], id: 'p3', name: 'Beto Exemplo', active: false },
+      ],
+      // p1 faz só Corte; p2 faz só Barba.
+      links: [
+        { professional_id: 'p1', service_id: 's1' },
+        { professional_id: 'p2', service_id: 's2' },
+      ],
+    }
+
+    beforeEach(() => api.loadAgendaReference.mockResolvedValue(team))
+
+    it('mostra um profissional por vez e troca pelo seletor', async () => {
+      renderAgenda()
+      expect(await screen.findByRole('button', { name: /10:00–10:30/ })).toBeInTheDocument()
+      const select = screen.getByLabelText('Profissional')
+      expect(within(select).getByRole('option', { name: 'Beto Exemplo (inativo)' })).toBeTruthy()
+      fireEvent.change(select, { target: { value: 'p2' } })
+      expect(screen.queryByRole('button', { name: /10:00–10:30/ })).not.toBeInTheDocument()
+      expect(screen.getByText('Nenhum agendamento neste dia.')).toBeInTheDocument()
+    })
+
+    it('novo agendamento usa o profissional da agenda e só os serviços dele', async () => {
+      api.createAppointment.mockResolvedValue(undefined)
+      renderAgenda()
+      await screen.findByRole('button', { name: /10:00–10:30/ })
+      fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: 'p2' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Novo agendamento' }))
+      const dialog = screen.getByRole('dialog', { name: 'Novo agendamento' })
+      const professional = within(dialog).getByLabelText('Profissional')
+      expect(professional).toHaveValue('p2')
+      // Inativos não aparecem para novos agendamentos.
+      expect(within(professional).queryByRole('option', { name: /Beto/ })).not.toBeInTheDocument()
+      const service = within(dialog).getByLabelText('Serviço')
+      expect(
+        within(service)
+          .getAllByRole('option')
+          .map((o) => o.textContent),
+      ).toEqual([expect.stringContaining('Barba')])
+
+      // Trocar de profissional troca também o serviço escolhido.
+      fireEvent.change(professional, { target: { value: 'p1' } })
+      expect(within(dialog).getByLabelText('Serviço')).toHaveValue('s1')
+      fireEvent.change(within(dialog).getByLabelText('Cliente'), { target: { value: 'c1' } })
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Agendar' }))
+      await waitFor(() =>
+        expect(api.createAppointment).toHaveBeenCalledWith(
+          'org-1',
+          expect.objectContaining({ professionalId: 'p1', serviceId: 's1' }),
+        ),
+      )
+    })
+
+    it('avisa quando o profissional não faz nenhum serviço', async () => {
+      api.loadAgendaReference.mockResolvedValue({ ...team, links: team.links.slice(0, 1) })
+      renderAgenda()
+      await screen.findByRole('button', { name: /10:00–10:30/ })
+      fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: 'p2' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Novo agendamento' }))
+      const dialog = screen.getByRole('dialog', { name: 'Novo agendamento' })
+      expect(
+        within(dialog).getByText('Ana Exemplo não faz nenhum serviço ativo'),
+      ).toBeInTheDocument()
+      expect(within(dialog).queryByLabelText('Serviço')).not.toBeInTheDocument()
+    })
+
+    it('o bloqueio vale para o profissional escolhido', async () => {
+      api.createBlock.mockResolvedValue(undefined)
+      renderAgenda()
+      await screen.findByRole('button', { name: /10:00–10:30/ })
+      fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: 'p2' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Bloquear horário' }))
+      const dialog = screen.getByRole('dialog', { name: 'Bloquear horário' })
+      expect(dialog).toHaveTextContent('Vale só para a agenda de Ana Exemplo.')
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Bloquear' }))
+      await waitFor(() =>
+        expect(api.createBlock).toHaveBeenCalledWith(
+          'org-1',
+          'p2',
+          '2030-01-07T15:00:00.000Z',
+          '2030-01-07T16:00:00.000Z',
+          '',
+        ),
+      )
+    })
+  })
+
+  it('sem profissional, orienta a cadastrar em Equipe', async () => {
+    api.loadAgendaReference.mockResolvedValue({ ...reference, professionals: [], links: [] })
+    renderAgenda()
+    expect(await screen.findByText('Nenhum profissional cadastrado')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Equipe' })).toHaveAttribute('href', '/painel/equipe')
+    expect(screen.getByRole('button', { name: 'Novo agendamento' })).toBeDisabled()
   })
 
   it('agendamento cancelado aparece só para consulta', async () => {

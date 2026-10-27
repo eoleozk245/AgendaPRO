@@ -32,6 +32,7 @@ type Row<T extends keyof Database['public']['Tables']> = Database['public']['Tab
 export type Organization = Row<'organizations'>
 export type Service = Row<'services'>
 export type Professional = Row<'professionals'>
+export type ProfessionalService = Row<'professional_services'>
 export type BusinessHour = Row<'business_hours'>
 export type Client = Row<'clients'>
 export type Appointment = Row<'appointments'>

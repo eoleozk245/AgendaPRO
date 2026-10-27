@@ -1,4 +1,12 @@
-import { Building2, CalendarDays, Clock, Scissors, Users, type LucideIcon } from 'lucide-react'
+import {
+  Building2,
+  CalendarDays,
+  Clock,
+  Scissors,
+  UserCog,
+  Users,
+  type LucideIcon,
+} from 'lucide-react'
 import { NavLink, Outlet } from 'react-router'
 import { useOrganization } from '../organization/organization-context.ts'
 import styles from './PanelLayout.module.css'
@@ -6,6 +14,7 @@ import styles from './PanelLayout.module.css'
 const links: { to: string; label: string; Icon: LucideIcon; end?: boolean }[] = [
   { to: '/painel', label: 'Agenda', Icon: CalendarDays, end: true },
   { to: '/painel/servicos', label: 'Serviços', Icon: Scissors },
+  { to: '/painel/equipe', label: 'Equipe', Icon: UserCog },
   { to: '/painel/horarios', label: 'Horários', Icon: Clock },
   { to: '/painel/clientes', label: 'Clientes', Icon: Users },
   { to: '/painel/estabelecimento', label: 'Estabelecimento', Icon: Building2 },

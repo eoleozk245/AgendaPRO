@@ -1,11 +1,13 @@
 import { Ban, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useCallback, useState } from 'react'
+import { Link } from 'react-router'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
 import { ConfirmDialog } from '../../components/ConfirmDialog.tsx'
 import { LoadingState } from '../../components/LoadingState.tsx'
 import { PageHeader } from '../../components/PageHeader.tsx'
-import type { AvailabilityBlock } from '../../lib/database.types.ts'
+import { SelectField } from '../../components/SelectField.tsx'
+import type { AvailabilityBlock, Professional } from '../../lib/database.types.ts'
 import { errorText } from '../../lib/db-errors.ts'
 import {
   addDays,
@@ -33,6 +35,11 @@ type Dialog =
   | { kind: 'remove-block'; block: AvailabilityBlock }
   | null
 
+/** Ativos primeiro; inativos continuam na lista para consultar o que já foi marcado. */
+function sortForAgenda(professionals: Professional[]): Professional[] {
+  return [...professionals].sort((a, b) => Number(b.active) - Number(a.active))
+}
+
 export function AgendaPage() {
   const { organization } = useOrganization()
   const timeZone = organization.timezone
@@ -40,6 +47,7 @@ export function AgendaPage() {
   const [view, setView] = useState<View>('day')
   const [date, setDate] = useState(today)
   const [dialog, setDialog] = useState<Dialog>(null)
+  const [selectedProfessionalId, setSelectedProfessionalId] = useState<string>()
 
   const rangeStart = view === 'day' ? date : startOfWeek(date)
   const rangeEnd = addDays(rangeStart, view === 'day' ? 1 : 7)
@@ -60,8 +68,19 @@ export function AgendaPage() {
       ? formatDayLabel(date)
       : `${formatShortDate(rangeStart)} a ${formatShortDate(addDays(rangeStart, 6))}`
   const unit = view === 'day' ? 'Dia' : 'Semana'
+  // A agenda mostra um profissional por vez (D-020).
+  const professionals =
+    reference.state.status === 'ready' ? sortForAgenda(reference.state.data.professionals) : []
   const professional =
-    reference.state.status === 'ready' ? reference.state.data.professionals[0] : undefined
+    professionals.find((p) => p.id === selectedProfessionalId) ?? professionals[0]
+  const appointments =
+    agenda.state.status === 'ready'
+      ? agenda.state.data.appointments.filter((a) => a.professional_id === professional?.id)
+      : []
+  const blocks =
+    agenda.state.status === 'ready'
+      ? agenda.state.data.blocks.filter((b) => b.professional_id === professional?.id)
+      : []
 
   function afterChange() {
     setDialog(null)
@@ -85,7 +104,7 @@ export function AgendaPage() {
             </Button>
             <Button
               icon={<Plus size={18} />}
-              disabled={reference.state.status !== 'ready'}
+              disabled={!professional}
               onClick={() => setDialog({ kind: 'new' })}
             >
               Novo agendamento
@@ -93,6 +112,21 @@ export function AgendaPage() {
           </div>
         }
       />
+
+      {professionals.length > 1 && professional && (
+        <SelectField
+          className={styles.professional}
+          label="Profissional"
+          value={professional.id}
+          onChange={(event) => setSelectedProfessionalId(event.target.value)}
+        >
+          {professionals.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.active ? option.name : `${option.name} (inativo)`}
+            </option>
+          ))}
+        </SelectField>
+      )}
 
       <div className={styles.toolbar}>
         <div className={styles.navigation}>
@@ -161,15 +195,20 @@ export function AgendaPage() {
           </Button>
         </Alert>
       )}
-      {agenda.state.status === 'ready' && reference.state.status === 'ready' && (
+      {reference.state.status === 'ready' && !professional && (
+        <Alert tone="warning" title="Nenhum profissional cadastrado">
+          Cadastre quem atende em <Link to="/painel/equipe">Equipe</Link> para usar a agenda.
+        </Alert>
+      )}
+      {agenda.state.status === 'ready' && reference.state.status === 'ready' && professional && (
         <>
           {view === 'day' ? (
             <DayView
               date={date}
               timeZone={timeZone}
               hours={reference.state.data.hours}
-              appointments={agenda.state.data.appointments}
-              blocks={agenda.state.data.blocks}
+              appointments={appointments}
+              blocks={blocks}
               nowMinute={date === today ? utcToZoned(new Date(), timeZone).minutesOfDay : undefined}
               onSelect={(appointment) => setDialog({ kind: 'edit', appointment })}
               onRemoveBlock={(block) => setDialog({ kind: 'remove-block', block })}
@@ -179,8 +218,8 @@ export function AgendaPage() {
               weekStart={rangeStart}
               today={today}
               timeZone={timeZone}
-              appointments={agenda.state.data.appointments}
-              blocks={agenda.state.data.blocks}
+              appointments={appointments}
+              blocks={blocks}
               onSelect={(appointment) => setDialog({ kind: 'edit', appointment })}
               onOpenDay={(day) => {
                 setDate(day)
@@ -192,6 +231,7 @@ export function AgendaPage() {
       )}
 
       {reference.state.status === 'ready' &&
+        professional &&
         (dialog?.kind === 'new' || dialog?.kind === 'edit') && (
           <AppointmentModal
             organizationId={organization.id}
@@ -199,6 +239,7 @@ export function AgendaPage() {
             reference={reference.state.data}
             appointment={dialog.kind === 'edit' ? dialog.appointment : undefined}
             defaultDate={date}
+            defaultProfessionalId={professional.id}
             onClose={() => setDialog(null)}
             onChanged={afterChange}
           />
@@ -207,6 +248,7 @@ export function AgendaPage() {
         <BlockModal
           organizationId={organization.id}
           professionalId={professional.id}
+          professionalName={professionals.length > 1 ? professional.name : undefined}
           timeZone={timeZone}
           defaultDate={date}
           onClose={() => setDialog(null)}

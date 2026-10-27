@@ -59,15 +59,43 @@ test('serviços: lista e modal de novo serviço fecha com Esc', async ({ page })
   await expect(dialog).toBeHidden()
 })
 
+test('equipe: lista profissionais e a agenda troca de profissional', async ({ page }) => {
+  await page.goto('/painel/equipe')
+  await expect(page.getByRole('heading', { level: 1, name: 'Equipe' })).toBeVisible()
+  const row = page.getByRole('row', { name: /^Profissional Exemplo Corte/ })
+  await expect(row).toContainText('Corte de cabelo, Barba')
+  await expect(row).toContainText('Ativo')
+  await expect(page.getByRole('row', { name: /Profissional Exemplo Dois/ })).toContainText(
+    'Inativo',
+  )
+  await expectAccessibleLayout(page)
+
+  await page.getByRole('button', { name: 'Editar Profissional Exemplo Dois' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Editar profissional' })
+  await expect(dialog.getByRole('group', { name: 'Serviços que faz' })).toBeVisible()
+  await expectAccessibleLayout(page)
+  await page.keyboard.press('Escape')
+
+  await page.getByRole('link', { name: 'Agenda' }).click()
+  const select = page.getByLabel('Profissional')
+  await expect(select).toHaveValue('p1')
+  await expect(page.getByRole('button', { name: /10:00–11:00/ })).toBeVisible()
+  await select.selectOption('p2')
+  await expect(page.getByText('Nenhum agendamento neste dia.')).toBeVisible()
+})
+
 test.describe('no celular', () => {
   test.use({ viewport: { width: 390, height: 844 }, colorScheme: 'dark' })
 
-  test('agenda e serviços cabem na tela', async ({ page }) => {
+  test('agenda, serviços e equipe cabem na tela', async ({ page }) => {
     await page.goto('/painel')
     await expect(page.getByRole('button', { name: /10:00–11:00/ })).toBeVisible()
     await expectAccessibleLayout(page)
     await page.getByRole('link', { name: 'Serviços' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Serviços' })).toBeVisible()
+    await expectAccessibleLayout(page)
+    await page.getByRole('link', { name: 'Equipe' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Equipe' })).toBeVisible()
     await expectAccessibleLayout(page)
   })
 })

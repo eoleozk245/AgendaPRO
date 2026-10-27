@@ -1,4 +1,4 @@
-import type { Organization, Professional } from '../../lib/database.types.ts'
+import type { Organization } from '../../lib/database.types.ts'
 import { throwIfError } from '../../lib/db-errors.ts'
 import { supabase } from '../../lib/supabase.ts'
 
@@ -19,19 +19,4 @@ export async function updateOrganization(
     .single()
   throwIfError(error)
   return data as Organization
-}
-
-export async function listProfessionals(organizationId: string): Promise<Professional[]> {
-  const { data, error } = await supabase
-    .from('professionals')
-    .select('*')
-    .eq('organization_id', organizationId)
-    .order('created_at')
-  throwIfError(error)
-  return data ?? []
-}
-
-export async function renameProfessional(id: string, name: string): Promise<void> {
-  const { error } = await supabase.from('professionals').update({ name }).eq('id', id)
-  throwIfError(error)
 }

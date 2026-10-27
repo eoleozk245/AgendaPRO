@@ -4,6 +4,11 @@
   gap: var(--space-2);
 }
 
+.professional {
+  max-width: 320px;
+  margin-bottom: var(--space-4);
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -62,6 +67,10 @@
 }
 
 @media (max-width: 480px) {
+  .professional {
+    max-width: none;
+  }
+
   .headerActions > * {
     flex: 1;
   }
