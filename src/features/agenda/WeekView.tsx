@@ -44,7 +44,7 @@ export function WeekView({
           <li key={date} className={styles.day}>
             <div className={styles.header}>
               <h3 className={styles.dayTitle}>
-                {formatDayLabel(date)}
+                <span className={styles.dayName}>{formatDayLabel(date)}</span>
                 {date === today && (
                   <Badge tone="info" icon={<CalendarDays size={14} />}>
                     Hoje

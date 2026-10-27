@@ -31,7 +31,12 @@
   font-weight: var(--weight-semibold);
 }
 
-.dayTitle::first-letter {
+/* ::first-letter não vale em flex container: a inicial maiúscula fica no span. */
+.dayName {
+  display: inline-block;
+}
+
+.dayName::first-letter {
   text-transform: uppercase;
 }
 
