@@ -102,6 +102,13 @@
   --control-height-md: 44px;
 }
 
+/* Tela de toque (celular, tablet): todo controle com pelo menos 44 px. */
+@media (pointer: coarse) {
+  :root {
+    --control-height-sm: 44px;
+  }
+}
+
 /*
  * Tema escuro revisado à parte (não é o claro invertido): superfícies sobem de
  * tom em vez de usar sombra, texto não é branco puro e os tons de feedback são

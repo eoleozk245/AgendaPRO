@@ -172,6 +172,7 @@
 }
 
 .blockRemove {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -182,6 +183,13 @@
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
+}
+
+/* Área de toque de 44 px sem aumentar o ícone (o bloqueio pode ser baixo). */
+.blockRemove::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .blockRemove:hover {

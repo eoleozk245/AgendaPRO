@@ -110,3 +110,23 @@ test.describe('no celular', () => {
     await expectAccessibleLayout(page)
   })
 })
+
+test.describe('em tela de toque', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+
+  test('controles têm pelo menos 44 px e o menu mostra a página atual', async ({ page }) => {
+    await page.goto('/painel')
+    await expect(page.getByRole('button', { name: /10:00–11:00/ })).toBeVisible()
+    for (const name of ['Dia anterior', 'Hoje', 'Próximo dia']) {
+      const box = await page.getByRole('button', { name, exact: true }).boundingBox()
+      expect(box?.width, name).toBeGreaterThanOrEqual(44)
+      expect(box?.height, name).toBeGreaterThanOrEqual(44)
+    }
+
+    // "Estabelecimento" é o último item: a faixa do menu rola até ele.
+    await page.goto('/painel/estabelecimento')
+    await expect(page.getByRole('heading', { level: 1, name: 'Estabelecimento' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Estabelecimento' })).toBeInViewport({ ratio: 1 })
+    await expectAccessibleLayout(page)
+  })
+})

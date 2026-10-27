@@ -40,6 +40,17 @@ textarea {
   color: inherit;
 }
 
+/* Sem espera de duplo toque (zoom) ao tocar em controles no celular. */
+a,
+button,
+input,
+label,
+select,
+summary,
+textarea {
+  touch-action: manipulation;
+}
+
 /* Foco visível só para teclado, igual em todos os elementos interativos. */
 :focus-visible {
   outline: 2px solid var(--color-focus);
