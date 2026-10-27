@@ -11,7 +11,7 @@ import styles from './AppointmentModal.module.css'
 type Props = {
   organizationId: string
   professionalId: string
-  /** Mostrado quando há mais de um profissional, para deixar claro de quem é a agenda. */
+  /** Vai no título quando há mais de um profissional, para deixar claro de quem é a agenda. */
   professionalName?: string
   timeZone: string
   defaultDate: string
@@ -66,7 +66,7 @@ export function BlockModal({
   return (
     <Modal
       open
-      title="Bloquear horário"
+      title={professionalName ? `Bloquear horário de ${professionalName}` : 'Bloquear horário'}
       onClose={onClose}
       footer={
         <>
@@ -80,15 +80,7 @@ export function BlockModal({
       }
     >
       <form id={formId} className={styles.form} onSubmit={handleSubmit} noValidate>
-        <p>
-          Ninguém consegue agendar no período bloqueado (folga, compromisso, almoço extra).
-          {professionalName && (
-            <>
-              {' '}
-              Vale só para a agenda de <strong>{professionalName}</strong>.
-            </>
-          )}
-        </p>
+        <p>Ninguém consegue agendar no período bloqueado (folga, compromisso, almoço extra).</p>
         <TextField
           label="Data"
           type="date"

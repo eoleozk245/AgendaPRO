@@ -40,7 +40,8 @@ type Props = {
   /** Profissional sugerido para um novo agendamento (o que está na agenda). */
   defaultProfessionalId: string
   onClose: () => void
-  onChanged: () => void
+  /** Ao salvar o formulário, informa onde o agendamento ficou. */
+  onChanged: (saved?: { professionalId: string; date: string }) => void
 }
 
 const ACTION_LABEL: Record<AppointmentStatus, string> = {
@@ -139,7 +140,7 @@ export function AppointmentModal({
     try {
       if (appointment) await updateAppointment(appointment.id, input)
       else await createAppointment(organizationId, input)
-      onChanged()
+      onChanged({ professionalId, date })
     } catch (caught) {
       setError(errorText(caught))
       setSaving(false)
@@ -260,10 +261,15 @@ export function AppointmentModal({
             >
               {professionals.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.name}
+                  {option.active ? option.name : `${option.name} (inativo)`}
                 </option>
               ))}
             </SelectField>
+          )}
+          {professionals.length === 1 && reference.professionals.length > 1 && (
+            <p>
+              Profissional: <strong>{professionalName}</strong>
+            </p>
           )}
           {services.length > 0 ? (
             <SelectField

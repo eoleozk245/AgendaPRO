@@ -12,4 +12,3 @@ export const professionalFormSchema = z.object({
 })
 
 export type ProfessionalFormInput = z.input<typeof professionalFormSchema>
-export type ProfessionalFormOutput = z.output<typeof professionalFormSchema>

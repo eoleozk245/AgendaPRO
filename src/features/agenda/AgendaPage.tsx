@@ -127,6 +127,14 @@ export function AgendaPage() {
           ))}
         </SelectField>
       )}
+      {professional && !professional.active && (
+        <div className={styles.notice}>
+          <Alert tone="info" title={`${professional.name} está inativo`}>
+            A agenda fica para consulta: dá para cancelar ou passar cada horário para outro
+            profissional. Novos agendamentos vão para quem está ativo.
+          </Alert>
+        </div>
+      )}
 
       <div className={styles.toolbar}>
         <div className={styles.navigation}>
@@ -156,6 +164,9 @@ export function AgendaPage() {
           </Button>
           <h2 className={styles.label} aria-live="polite">
             {label}
+            {professionals.length > 1 && professional && (
+              <span className="visually-hidden"> · agenda de {professional.name}</span>
+            )}
           </h2>
         </div>
         <div className={styles.viewSwitch} role="group" aria-label="Visualização">
@@ -241,7 +252,14 @@ export function AgendaPage() {
             defaultDate={date}
             defaultProfessionalId={professional.id}
             onClose={() => setDialog(null)}
-            onChanged={afterChange}
+            onChanged={(saved) => {
+              // Mostra onde o agendamento ficou (pode ser outro profissional ou outro dia).
+              if (saved) {
+                setSelectedProfessionalId(saved.professionalId)
+                setDate(saved.date)
+              }
+              afterChange()
+            }}
           />
         )}
       {dialog?.kind === 'block' && professional && (

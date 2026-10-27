@@ -268,6 +268,53 @@ describe('AgendaPage', () => {
           expect.objectContaining({ professionalId: 'p1', serviceId: 's1' }),
         ),
       )
+      // A agenda vai para onde o agendamento ficou, para ele não "sumir".
+      await waitFor(() =>
+        expect(screen.queryByRole('dialog', { name: 'Novo agendamento' })).not.toBeInTheDocument(),
+      )
+      expect(screen.getByLabelText('Profissional')).toHaveValue('p1')
+    })
+
+    it('a agenda de um inativo é só consulta e o novo agendamento diz quem atende', async () => {
+      api.loadAgendaReference.mockResolvedValue({
+        ...team,
+        professionals: team.professionals.map((p) => (p.id === 'p2' ? { ...p, active: false } : p)),
+      })
+      renderAgenda()
+      await screen.findByRole('button', { name: /10:00–10:30/ })
+      fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: 'p3' } })
+      expect(screen.getByText('Beto Exemplo está inativo')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('agenda de Beto Exemplo')
+      fireEvent.click(screen.getByRole('button', { name: 'Novo agendamento' }))
+      const dialog = screen.getByRole('dialog', { name: 'Novo agendamento' })
+      // Só um ativo: sem seletor, mas a tela diz para quem vai o agendamento.
+      expect(within(dialog).queryByLabelText('Profissional')).not.toBeInTheDocument()
+      expect(dialog).toHaveTextContent('Profissional: Profissional')
+    })
+
+    it('a semana mostra só os agendamentos e bloqueios do profissional escolhido', async () => {
+      api.loadAgenda.mockResolvedValue({
+        appointments: [appointment],
+        blocks: [
+          {
+            id: 'b1',
+            organization_id: 'org-1',
+            professional_id: 'p2',
+            starts_at: '2030-01-08T15:00:00Z',
+            ends_at: '2030-01-08T16:00:00Z',
+            reason: 'Folga',
+            created_at: now,
+          },
+        ],
+      })
+      renderAgenda()
+      await screen.findByRole('button', { name: /10:00–10:30/ })
+      fireEvent.click(screen.getByRole('button', { name: 'Semana' }))
+      expect(await screen.findByRole('button', { name: /10:00–10:30/ })).toBeInTheDocument()
+      expect(screen.queryByText(/Folga/)).not.toBeInTheDocument()
+      fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: 'p2' } })
+      expect(screen.queryByRole('button', { name: /10:00–10:30/ })).not.toBeInTheDocument()
+      expect(screen.getByText(/Bloqueado 12:00–13:00 · Folga/)).toBeInTheDocument()
     })
 
     it('avisa quando o profissional não faz nenhum serviço', async () => {
@@ -289,8 +336,7 @@ describe('AgendaPage', () => {
       await screen.findByRole('button', { name: /10:00–10:30/ })
       fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: 'p2' } })
       fireEvent.click(screen.getByRole('button', { name: 'Bloquear horário' }))
-      const dialog = screen.getByRole('dialog', { name: 'Bloquear horário' })
-      expect(dialog).toHaveTextContent('Vale só para a agenda de Ana Exemplo.')
+      const dialog = screen.getByRole('dialog', { name: 'Bloquear horário de Ana Exemplo' })
       fireEvent.click(within(dialog).getByRole('button', { name: 'Bloquear' }))
       await waitFor(() =>
         expect(api.createBlock).toHaveBeenCalledWith(

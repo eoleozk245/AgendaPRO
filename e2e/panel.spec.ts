@@ -74,7 +74,15 @@ test('equipe: lista profissionais e a agenda troca de profissional', async ({ pa
   const dialog = page.getByRole('dialog', { name: 'Editar profissional' })
   await expect(dialog.getByRole('group', { name: 'Serviços que faz' })).toBeVisible()
   await expectAccessibleLayout(page)
-  await page.keyboard.press('Escape')
+
+  // Salvar troca a lista de serviços numa chamada só ao banco.
+  await dialog.getByLabel('Corte de cabelo').check()
+  const saved = page.waitForRequest('**/rest/v1/rpc/set_professional_services')
+  await dialog.getByRole('button', { name: 'Salvar' }).click()
+  expect((await saved).postDataJSON()).toEqual({
+    p_professional_id: 'p2',
+    p_service_ids: ['s1'],
+  })
   await expect(dialog).toBeHidden()
 
   await page.getByRole('link', { name: 'Agenda' }).click()

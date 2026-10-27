@@ -9,6 +9,10 @@
   margin-bottom: var(--space-4);
 }
 
+.notice {
+  margin-bottom: var(--space-4);
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;

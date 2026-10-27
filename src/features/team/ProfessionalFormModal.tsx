@@ -29,8 +29,8 @@ function initialValues(services: Service[], professional?: TeamMember): Professi
   return {
     name: professional?.name ?? '',
     active: professional?.active ?? true,
-    // Novo profissional começa fazendo todos os serviços ativos.
-    serviceIds: professional?.serviceIds ?? services.filter((s) => s.active).map((s) => s.id),
+    // Novo profissional começa fazendo todos os serviços, como o banco faz ao criar.
+    serviceIds: professional?.serviceIds ?? services.map((s) => s.id),
   }
 }
 
@@ -49,6 +49,8 @@ export function ProfessionalFormModal({
   // Salvar um novo são duas etapas (criar e escolher serviços). Se a segunda
   // falhar, "Salvar" de novo atualiza o que já foi criado em vez de duplicar.
   const [createdId, setCreatedId] = useState<string>()
+  // Se o profissional já foi criado, fechar também recarrega a lista para ele aparecer.
+  const close = createdId ? onSaved : onClose
 
   function toggleService(serviceId: string, checked: boolean) {
     setValues((current) => ({
@@ -89,10 +91,10 @@ export function ProfessionalFormModal({
     <Modal
       open
       title={professional ? 'Editar profissional' : 'Novo profissional'}
-      onClose={onClose}
+      onClose={close}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={close}>
             Cancelar
           </Button>
           <Button type="submit" form={formId} loading={saving}>

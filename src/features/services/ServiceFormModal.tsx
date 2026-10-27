@@ -128,6 +128,12 @@ export function ServiceFormModal({ organizationId, service, onClose, onSaved }: 
           checked={values.active}
           onChange={(event) => update('active', event.target.checked)}
         />
+        {!service && (
+          <p className={styles.note}>
+            Toda a equipe passa a fazer este serviço. Para mudar quem faz, edite cada profissional
+            em Equipe.
+          </p>
+        )}
         {formError && <Alert tone="error" title={formError} />}
       </form>
     </Modal>

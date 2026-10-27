@@ -1,4 +1,4 @@
-import { Check, Pencil, Plus, Trash2, UserCog, X } from 'lucide-react'
+import { Check, Pencil, Plus, Trash2, TriangleAlert, UserCog, X } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { Alert } from '../../components/Alert.tsx'
 import { Badge } from '../../components/Badge.tsx'
@@ -18,9 +18,24 @@ import styles from './TeamPage.module.css'
 
 type Editing = { mode: 'new' } | { mode: 'edit'; professional: TeamMember } | null
 
-function serviceNames(professional: TeamMember, services: Service[]): string {
-  const names = services.filter((s) => professional.serviceIds.includes(s.id)).map((s) => s.name)
-  return names.length > 0 ? names.join(', ') : 'Nenhum serviço'
+function ServiceList({
+  professional,
+  services,
+}: {
+  professional: TeamMember
+  services: Service[]
+}) {
+  const linked = services.filter((s) => professional.serviceIds.includes(s.id))
+  // Ativo sem nenhum serviço ativo não aparece na página de agendamento.
+  if (professional.active && !linked.some((s) => s.active)) {
+    return (
+      <Badge tone="warning" icon={<TriangleAlert size={14} />}>
+        Nenhum serviço ativo
+      </Badge>
+    )
+  }
+  if (linked.length === 0) return <span className={table.muted}>Nenhum serviço</span>
+  return <>{linked.map((s) => (s.active ? s.name : `${s.name} (inativo)`)).join(', ')}</>
 }
 
 export function TeamPage() {
@@ -84,7 +99,9 @@ export function TeamPage() {
                 {data.professionals.map((professional) => (
                   <tr key={professional.id}>
                     <td>{professional.name}</td>
-                    <td data-label="Serviços">{serviceNames(professional, data.services)}</td>
+                    <td data-label="Serviços">
+                      <ServiceList professional={professional} services={data.services} />
+                    </td>
                     <td data-label="Situação">
                       {professional.active ? (
                         <Badge tone="success" icon={<Check size={14} />}>
@@ -149,8 +166,9 @@ export function TeamPage() {
           }}
         >
           <p>
-            Excluir <strong>{deleting.name}</strong>? Essa ação não pode ser desfeita. Se a pessoa
-            só parou de atender, edite e desmarque “Ativo”: o histórico fica guardado.
+            Excluir <strong>{deleting.name}</strong>? Só dá para excluir quem nunca teve
+            agendamento, e não tem volta. Se a pessoa parou de atender, edite e desmarque “Ativo”: o
+            histórico fica guardado.
           </p>
         </ConfirmDialog>
       )}

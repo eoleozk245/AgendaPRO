@@ -68,6 +68,7 @@ describe('TeamPage', () => {
     })
     renderTeam()
     expect(await screen.findByText('Nenhum profissional ativo')).toBeInTheDocument()
+    // Inativo sem serviço não precisa de alerta.
     expect(screen.getByText('Nenhum serviço')).toBeInTheDocument()
   })
 
@@ -84,14 +85,17 @@ describe('TeamPage', () => {
     renderTeam()
     fireEvent.click(await screen.findByRole('button', { name: 'Novo profissional' }))
     const dialog = screen.getByRole('dialog', { name: 'Novo profissional' })
+    // Igual ao banco: começa com todos os serviços, inclusive os inativos.
     expect(within(dialog).getByLabelText('Corte')).toBeChecked()
     expect(within(dialog).getByLabelText('Barba')).toBeChecked()
-    expect(within(dialog).getByLabelText('Luzes')).not.toBeChecked()
+    expect(within(dialog).getByLabelText('Luzes')).toBeChecked()
 
     fireEvent.change(within(dialog).getByLabelText(/Nome/), { target: { value: ' Beto ' } })
     fireEvent.click(within(dialog).getByLabelText('Barba'))
     fireEvent.click(within(dialog).getByRole('button', { name: 'Salvar' }))
-    await waitFor(() => expect(api.setProfessionalServices).toHaveBeenCalledWith('p2', ['s1']))
+    await waitFor(() =>
+      expect(api.setProfessionalServices).toHaveBeenCalledWith('p2', ['s1', 's3']),
+    )
     expect(api.createProfessional).toHaveBeenCalledWith('org-1', 'Beto', true)
   })
 
@@ -110,6 +114,34 @@ describe('TeamPage', () => {
     await waitFor(() => expect(api.setProfessionalServices).toHaveBeenCalledTimes(2))
     expect(api.createProfessional).toHaveBeenCalledTimes(1)
     expect(api.updateProfessional).toHaveBeenCalledWith('p2', 'Beto', true)
+  })
+
+  it('se cancelar depois de criar pela metade, a lista recarrega e mostra quem foi criado', async () => {
+    api.createProfessional.mockResolvedValue('p2')
+    api.setProfessionalServices.mockRejectedValue(new UserFacingError('Falhou.'))
+    renderTeam()
+    fireEvent.click(await screen.findByRole('button', { name: 'Novo profissional' }))
+    const dialog = screen.getByRole('dialog', { name: 'Novo profissional' })
+    fireEvent.change(within(dialog).getByLabelText(/Nome/), { target: { value: 'Beto' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Salvar' }))
+    await within(dialog).findByRole('alert')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancelar' }))
+    await waitFor(() => expect(api.loadTeam).toHaveBeenCalledTimes(2))
+  })
+
+  it('marca serviço inativo e avisa quem está ativo sem nenhum serviço ativo', async () => {
+    api.loadTeam.mockResolvedValue({
+      professionals: [
+        { ...professional, serviceIds: ['s1', 's3'] },
+        { ...professional, id: 'p2', name: 'Beto Exemplo', serviceIds: ['s3'] },
+      ],
+      services,
+    })
+    renderTeam()
+    const ana = (await screen.findByText('Ana Exemplo')).closest('tr')!
+    expect(within(ana).getByText('Corte, Luzes (inativo)')).toBeInTheDocument()
+    const beto = screen.getByText('Beto Exemplo').closest('tr')!
+    expect(within(beto).getByText('Nenhum serviço ativo')).toBeInTheDocument()
   })
 
   it('edita nome, situação e serviços', async () => {
