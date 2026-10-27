@@ -38,3 +38,5 @@ Não dá para mudar estas configurações pelas ferramentas desta sessão. Elas 
 
 - Proteção extra contra robôs na reserva (ex.: CAPTCHA/Turnstile) se aparecer abuso de verdade.
 - LGPD antes de uso com clientes reais (ver `DECISIONS.md`).
+
+- **`private.booking_attempts` com RLS ligada e sem policy** (nível informativo no Advisor): é de propósito. Sem policy, ninguém lê pela API; só as funções do banco acessam. O schema `private` não é exposto.

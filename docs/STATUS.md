@@ -13,25 +13,14 @@
 | 5. Página pública                                | Feita                     | **Não aplicada**                                     |
 | 6. Acessibilidade, testes finais, CI, publicação | Feita, menos a publicação | —                                                    |
 
-O banco real já tem as tabelas das Etapas 2 a 4 (conferido com `list_migrations` e consulta ao catálogo em 27/10; ver `DATABASE.md`). Falta só a migração da página pública: sem ela, a página `/{endereço}` mostra o estado de erro, e as regras de reserva (antecedência e dias à frente) em "Estabelecimento" não salvam.
+O banco real já tem as quatro migrações (conferido em 27/10 com `list_migrations` e consultas ao catálogo; ver `DATABASE.md`). Os tipos do TypeScript agora vêm do gerador do Supabase.
 
-## O que falta para o MVP rodar de ponta a ponta
+## O que falta
 
-1. **Aplicar a migração pendente** (ver abaixo).
-2. **Gerar de novo os tipos** (`src/lib/database.types.ts`) a partir do banco. Hoje as partes das Etapas 3 a 5 foram escritas à mão no mesmo formato.
-3. **Ajustes no painel do Supabase** (`SECURITY.md`): senha mínima de 8 caracteres e URLs de redirecionamento.
-4. **Decidir a hospedagem** (proposta D-018) e tratar a LGPD antes de clientes reais.
-
-### Como aplicar as migrações
-
-A migração pendente está em `supabase/migrations/20261026120000_public_booking.sql`.
-
-Opções:
-
-- Pedir ao Claude para aplicar e responder quando o Supabase pedir confirmação (nas duas últimas tentativas a pergunta ficou sem resposta e a ferramenta desistiu depois de 60 segundos), ou
-- Colar cada arquivo, em ordem, no **SQL Editor** do painel do Supabase.
-
-Depois, rodar os testes pgTAP no projeto (ver `DATABASE.md`) e conferir o Advisor.
+1. **Rodar no banco real os testes pgTAP da agenda e da página pública.** Nas três tentativas a ferramenta do Supabase pediu confirmação ao Léo e desistiu. Ambos passam no PostgreSQL 16 local e no CI. O de cadastros (22/22) e o de isolamento (16/16) já passaram no banco real.
+2. **Ajustes no painel do Supabase** (`SECURITY.md`): senha mínima de 8 caracteres, proteção contra senhas vazadas e URLs de redirecionamento.
+3. **Decidir a hospedagem** (proposta D-018) e tratar a LGPD antes de clientes reais.
+4. **Teste manual de ponta a ponta** no navegador contra o banco real: criar serviço e horário no painel e reservar pela página pública.
 
 ## Verificações feitas
 
@@ -44,7 +33,7 @@ Depois, rodar os testes pgTAP no projeto (ver `DATABASE.md`) e conferir o Adviso
   - Telas do painel, agenda e página pública com respostas simuladas: axe-core sem violações em computador (1280 px) e celular (390 e 320 px), nos temas claro e escuro, e sem rolagem horizontal.
   - Build servido com os cabeçalhos de `public/_headers`: nenhum bloqueio do CSP, tema e fonte funcionando.
 - **Não verificado:**
-  - As migrações 2 a 4 no Supabase real (só no PostgreSQL 16 local; o projeto usa 17).
+  - Os testes pgTAP da agenda e da página pública no Supabase real (rodaram só no PostgreSQL 16 local e no CI; o projeto usa 17).
   - O envio real do e-mail de confirmação de cadastro.
   - Leitores de tela de verdade (NVDA, VoiceOver): só o axe e a navegação por teclado.
 

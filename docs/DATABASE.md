@@ -25,14 +25,14 @@ Projeto Supabase: `AgendaPRO` (ref `xlafrbbugxypjuuadszg`, região `sa-east-1`).
 
 ## Migrações aplicadas
 
-| Arquivo                                                   | Aplicada no projeto                                                                                                                                                                                        |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `20261026060000_organizations_and_memberships.sql`        | **Sim** (versão `20261026051254` no Supabase)                                                                                                                                                              |
-| `20261026080000_services_professionals_hours_clients.sql` | **Sim** (versão `20261027175242`, 27/10/2026, via Supabase MCP). Teste `catalog` (22/22) passou no banco real.                                                                                             |
-| `20261026100000_appointments_and_blocks.sql`              | **Sim** (versão `20261027175336`, 27/10/2026, via Supabase MCP). O teste `appointments` ainda não rodou no banco real (a ferramenta pediu confirmação sem resposta); passa no PostgreSQL 16 local e no CI. |
-| `20261026120000_public_booking.sql`                       | **Não.** A ferramenta pediu confirmação e ficou sem resposta (3 tentativas). Testada no PostgreSQL local e no CI.                                                                                          |
+| Arquivo                                                   | Aplicada no projeto                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261026060000_organizations_and_memberships.sql`        | **Sim** (versão `20261026051254` no Supabase)                                                                                                                                                                                                                                                                                                                                      |
+| `20261026080000_services_professionals_hours_clients.sql` | **Sim** (versão `20261027175242`, 27/10/2026, via Supabase MCP). Teste `catalog` (22/22) passou no banco real.                                                                                                                                                                                                                                                                     |
+| `20261026100000_appointments_and_blocks.sql`              | **Sim** (versão `20261027175336`, 27/10/2026, via Supabase MCP). O teste `appointments` ainda não rodou no banco real (a ferramenta pediu confirmação sem resposta); passa no PostgreSQL 16 local e no CI.                                                                                                                                                                         |
+| `20261026120000_public_booking.sql`                       | **Sim** (27/10/2026), aplicada pelo Léo no SQL Editor do painel. Conferido por consulta ao catálogo: 2 colunas novas, 3 funções públicas, `private.request_ip` e `private.booking_attempts`, e `anon` sem acesso à tabela de tentativas. **Não aparece em `list_migrations`**, porque o SQL Editor não grava no histórico. O teste `public_booking` ainda não rodou no banco real. |
 
-As versões acima vêm de `list_migrations` no projeto real e podem ser conferidas em Database > Migrations no painel. O Supabase grava a data em que aplicou, por isso o número difere do nome do arquivo.
+As versões das três primeiras vêm de `list_migrations` no projeto real e podem ser conferidas em Database > Migrations no painel. O Supabase grava a data em que aplicou, por isso o número difere do nome do arquivo.
 
 O Supabase registra cada migração com o horário em que foi aplicada, então o número de versão no painel pode ser diferente do nome do arquivo. O conteúdo é o mesmo.
 
@@ -54,3 +54,11 @@ O usuário `teste-e2e@exemplo.test` (fictício) existe no projeto para os testes
 
 - **Chaves estrangeiras compostas sem índice dedicado** (`appointments`, `availability_blocks`, `professional_services`, nível informativo): cada tabela já tem um índice que começa por `professional_id` (a exclusion constraint, `availability_blocks_professional_starts_idx` e a chave primária), e o PostgreSQL usa esse começo para as consultas e para os apagamentos em cascata. Um índice extra só aumentaria o custo de escrita.
 - **Índices "sem uso":** esperado enquanto o banco não tem dados reais. Rever depois que houver uso.
+
+## Histórico de migrações do Supabase
+
+A migração `20261026120000_public_booking.sql` foi aplicada pelo SQL Editor, então o histórico do Supabase não a conhece. Se um dia for usada a Supabase CLI (`supabase db push`), ela tentaria aplicar de novo e falharia. Antes, marque como aplicada: `supabase migration repair --status applied 20261026120000`. Os números das outras migrações no Supabase também diferem dos nomes dos arquivos (o Supabase usa o horário em que aplicou), então o `repair` pode ser necessário para elas também.
+
+## Tipos do TypeScript
+
+`src/lib/database.generated.ts` é a saída do gerador de tipos do Supabase (27/10/2026, banco real com as quatro migrações). `src/lib/database.types.ts` a embrulha e descreve só a exceção do agendamento: nome do serviço, duração, preço e fim são preenchidos por trigger, e o app só envia as colunas liberadas pelos grants. Depois de uma nova migração, gere de novo.
