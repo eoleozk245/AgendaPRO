@@ -75,9 +75,12 @@ test('equipe: lista profissionais e a agenda troca de profissional', async ({ pa
   await expect(dialog.getByRole('group', { name: 'Serviços que faz' })).toBeVisible()
   await expectAccessibleLayout(page)
   await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
 
   await page.getByRole('link', { name: 'Agenda' }).click()
-  const select = page.getByLabel('Profissional')
+  // Espera a agenda abrir: na Equipe, "Editar Profissional…" também casaria com o rótulo.
+  await expect(page.getByRole('heading', { level: 1, name: 'Agenda' })).toBeVisible()
+  const select = page.getByRole('combobox', { name: 'Profissional' })
   await expect(select).toHaveValue('p1')
   await expect(page.getByRole('button', { name: /10:00–11:00/ })).toBeVisible()
   await select.selectOption('p2')
