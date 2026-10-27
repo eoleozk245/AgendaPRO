@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>AgendaPRO</title>
+    <script>
+      // Aplica o tema antes da primeira pintura para a tela não "piscar".
+      // Mantenha a chave e os valores em sincronia com src/lib/theme.ts.
+      ;(function () {
+        var preference = null
+        try {
+          preference = localStorage.getItem('agendapro:theme')
+        } catch (error) {
+          // Armazenamento bloqueado: segue o sistema.
+        }
+        var prefersDark =
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+        var dark = preference === 'dark' || (preference !== 'light' && prefersDark)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

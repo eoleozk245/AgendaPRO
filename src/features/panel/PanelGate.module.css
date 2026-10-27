@@ -1,0 +1,13 @@
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  max-width: 480px;
+  margin: var(--space-8) auto 0;
+  padding: 0 var(--space-4);
+}
+
+.onboarding {
+  padding: 0 var(--space-4) var(--space-10);
+}

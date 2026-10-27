@@ -1,0 +1,124 @@
+/* Tabela compartilhada: rola na horizontal em telas estreitas sem quebrar a página. */
+.wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-semibold);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--color-text-secondary);
+}
+
+/*
+ * Celular: cada linha vira um cartão. Cada célula mostra o nome da coluna
+ * (atributo data-label) antes do valor, para não depender do cabeçalho.
+ */
+@media (max-width: 600px) {
+  .wrapper {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+
+  .table tr {
+    margin-bottom: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border);
+    text-align: right;
+  }
+
+  .table td[data-label]::before {
+    content: attr(data-label);
+    color: var(--color-text-secondary);
+    font-weight: var(--weight-medium);
+    text-align: left;
+  }
+
+  .table td:first-child {
+    display: block;
+    font-weight: var(--weight-semibold);
+    text-align: left;
+  }
+
+  .table td:first-child::before {
+    content: none;
+  }
+
+  .table tr td:last-child {
+    border-bottom: 0;
+  }
+
+  .numeric {
+    text-align: right;
+  }
+
+  .actions {
+    justify-content: flex-end;
+    width: 100%;
+  }
+}

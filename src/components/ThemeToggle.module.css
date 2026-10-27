@@ -1,0 +1,61 @@
+.group {
+  display: inline-flex;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.option {
+  position: relative;
+}
+
+.face {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-height-sm);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.option:hover .face {
+  color: var(--color-text);
+}
+
+/* Selecionado: muda fundo, cor, peso e ganha borda. Não depende só da cor. */
+.input:checked + .face {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+  box-shadow:
+    0 0 0 1px var(--color-border-input),
+    var(--shadow-sm);
+}
+
+.input:focus-visible + .face {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Em telas estreitas mostra só o ícone; o texto continua para leitores de tela. */
+@media (max-width: 480px) {
+  .face {
+    padding: 0 var(--space-2);
+  }
+
+  .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

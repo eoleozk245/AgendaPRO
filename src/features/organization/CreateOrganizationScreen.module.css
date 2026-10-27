@@ -1,0 +1,38 @@
+.card {
+  width: 100%;
+  max-width: 480px;
+  margin: var(--space-8) auto 0;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.submit {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .card {
+    margin-top: var(--space-4);
+  }
+}

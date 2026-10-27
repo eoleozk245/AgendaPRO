@@ -1,0 +1,7 @@
+.shell {
+  min-height: 100vh;
+}
+
+.centered {
+  padding: 0 var(--space-4) var(--space-10);
+}
