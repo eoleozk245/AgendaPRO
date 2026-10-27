@@ -45,6 +45,7 @@ export function PublicBookingPage() {
         )}
         {state.status === 'ready' && !state.data && (
           <EmptyState
+            pageTitle
             icon={SearchX}
             title="Página de agendamento não encontrada"
             description="Confira o endereço com o estabelecimento."

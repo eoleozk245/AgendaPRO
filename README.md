@@ -6,7 +6,7 @@ Projeto de portfólio com qualidade de produto real. Situação atual em [`docs/
 
 ## Stack
 
-React 19 + TypeScript + Vite · Supabase (PostgreSQL, Auth, RLS) · Zod · react-router · Vitest + Testing Library · pgTAP · ESLint + Prettier · GitHub Actions.
+React 19 + TypeScript + Vite · Supabase (PostgreSQL, Auth, RLS) · Zod · react-router · Vitest + Testing Library · Playwright + axe-core · pgTAP · ESLint + Prettier · GitHub Actions.
 
 ## Como rodar
 
@@ -31,9 +31,12 @@ npm run format       # formata com Prettier
 npm run format:check # confere a formatação
 npm test             # testes do app (Vitest)
 npm run test:db      # aplica as migrações num PostgreSQL temporário e roda os testes pgTAP
+npm run test:e2e     # testes de navegador (Playwright) com o Supabase simulado
 ```
 
 `npm run test:db` precisa de PostgreSQL 15+ e pgTAP instalados (ex.: `apt install postgresql-16 postgresql-16-pgtap`).
+
+`npm run test:e2e` usa o Playwright (`@playwright/test`) com o Chromium dele (`npx playwright install chromium` na primeira vez) e o `@axe-core/playwright` para checar acessibilidade em cada tela. As respostas do Supabase são simuladas: não precisa de banco nem de chave.
 
 ## Documentação
 

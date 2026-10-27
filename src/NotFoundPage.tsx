@@ -7,6 +7,7 @@ export function NotFoundPage() {
   return (
     <div className={styles.page}>
       <EmptyState
+        pageTitle
         icon={SearchX}
         title="Página não encontrada"
         description="O endereço pode estar errado ou a página não existe mais."

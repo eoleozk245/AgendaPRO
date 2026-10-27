@@ -134,7 +134,7 @@
 
 - **GitHub Actions** em todo PR e na `main`, com dois jobs: app (lint, formatação, tipos, testes e build) e banco (PostgreSQL 16 + pgTAP via `scripts/test-db.sh`). Necessidade concreta: o projeto já tem migrações e regras críticas que precisam ser verificadas sempre.
 - **Content Security Policy** e outros cabeçalhos em `public/_headers`. O script de tema é liberado por hash, e um teste confere se o hash bate com o `index.html`.
-- **Playwright** não entrou como dependência: os fluxos foram verificados no navegador com scripts temporários. Entra quando as migrações estiverem aplicadas e der para rodar ponta a ponta contra um banco de teste.
+- **Playwright** entrou (27/10) como suíte de navegador em `e2e/` (`npm run test:e2e`), com as respostas do Supabase **simuladas** por `page.route`: roda no CI sem segredos e nunca toca no banco real. Cada teste também passa pelo axe-core e confere que não há rolagem horizontal. Dependências: `@playwright/test` (mesma versão do Playwright do ambiente, 1.63.0, travada com `overrides` de `playwright-core`) e `@axe-core/playwright` (axe dentro dos testes). O teste de ponta a ponta contra o banco real continua manual.
 
 ### D-018 — Hospedagem
 
@@ -177,7 +177,6 @@
 - Hospedagem: proposta em D-018 (Cloudflare Pages), aguardando aprovação.
 - Cancelamento e remarcação pelo próprio cliente (hoje só pelo estabelecimento).
 - Política de retenção e exclusão de dados (LGPD): proposta em D-019, aguardando aprovação.
-- Playwright como suíte de ponta a ponta no repositório (ver D-017).
 - Componente de menu suspenso: criar quando uma tela precisar.
 - Busca e paginação de clientes no servidor quando a lista crescer.
 

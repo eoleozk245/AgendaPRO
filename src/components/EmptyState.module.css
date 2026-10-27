@@ -20,3 +20,9 @@
   margin-bottom: var(--space-2);
   font-size: var(--text-sm);
 }
+
+/* Como h1 (página não encontrada), mantém o mesmo visual do texto. */
+h1.title {
+  margin: 0;
+  font-size: var(--text-md);
+}
