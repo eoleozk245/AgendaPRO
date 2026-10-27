@@ -22,7 +22,13 @@ const dateChip = new Intl.DateTimeFormat('pt-BR', {
   month: 'short',
 })
 
-type Booked = { startsAt: string; serviceName: string; priceCents: number; durationMinutes: number }
+type Booked = {
+  startsAt: string
+  serviceName: string
+  priceCents: number
+  durationMinutes: number
+  professionalName?: string
+}
 
 export function BookingFlow({ page }: { page: PublicPage }) {
   const { organization, services, professionals } = page
@@ -42,6 +48,7 @@ export function BookingFlow({ page }: { page: PublicPage }) {
   )
   const effectiveProfessionalId =
     serviceProfessionals.length === 1 ? serviceProfessionals[0].id : professionalId
+  const professionalName = serviceProfessionals.find((p) => p.id === effectiveProfessionalId)?.name
 
   if (booked) {
     return (
@@ -201,7 +208,14 @@ export function BookingFlow({ page }: { page: PublicPage }) {
       {service && effectiveProfessionalId && date && startsAt && (
         <ContactStep
           step={serviceProfessionals.length > 1 ? 5 : 4}
-          summary={`${service.name} · ${formatDayLabel(date)} às ${utcToZoned(startsAt, timeZone).time} · ${formatCents(service.price_cents)}`}
+          summary={[
+            service.name,
+            professionalName && `com ${professionalName}`,
+            `${formatDayLabel(date)} às ${utcToZoned(startsAt, timeZone).time}`,
+            formatCents(service.price_cents),
+          ]
+            .filter(Boolean)
+            .join(' · ')}
           onSubmit={async (name, phone) => {
             const result = await bookAppointment({
               slug: organization.slug,
@@ -217,6 +231,7 @@ export function BookingFlow({ page }: { page: PublicPage }) {
                 serviceName: result.appointment.service_name,
                 priceCents: result.appointment.price_cents,
                 durationMinutes: service.duration_minutes,
+                professionalName,
               })
               return undefined
             }
@@ -384,6 +399,12 @@ function BookingSuccess({
           <dt>Serviço</dt>
           <dd>{booked.serviceName}</dd>
         </div>
+        {booked.professionalName && (
+          <div>
+            <dt>Profissional</dt>
+            <dd>{booked.professionalName}</dd>
+          </div>
+        )}
         <div>
           <dt>Quando</dt>
           <dd>
