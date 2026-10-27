@@ -166,6 +166,7 @@ describe('TeamPage', () => {
     const dialog = screen.getByRole('dialog', { name: 'Novo profissional' })
     fireEvent.click(within(dialog).getByRole('button', { name: 'Salvar' }))
     expect(await within(dialog).findByText(/pelo menos 2 caracteres/)).toBeInTheDocument()
+    await waitFor(() => expect(within(dialog).getByLabelText(/Nome/)).toHaveFocus())
     expect(api.createProfessional).not.toHaveBeenCalled()
   })
 

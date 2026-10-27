@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from 'react'
+import { focusFirstInvalid } from '../../lib/focus.ts'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
 import { Modal } from '../../components/Modal.tsx'
@@ -46,6 +47,7 @@ export function ClientFormModal({ organizationId, client, onClose, onSaved }: Pr
         next[key] ??= issue.message
       }
       setErrors(next)
+      focusFirstInvalid(event.currentTarget)
       return
     }
     setErrors({})

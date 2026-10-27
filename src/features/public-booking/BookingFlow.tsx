@@ -1,5 +1,6 @@
 import { CalendarX, CircleCheck, Clock } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { focusFirstInvalid } from '../../lib/focus.ts'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
 import { Card } from '../../components/Card.tsx'
@@ -329,7 +330,10 @@ function ContactStep({
     if (!isValidPhone(phoneDigits(phone)))
       next.phone = 'Informe DDD + número, ex.: (11) 98765-4321.'
     setErrors(next)
-    if (next.name || next.phone) return
+    if (next.name || next.phone) {
+      focusFirstInvalid(event.currentTarget)
+      return
+    }
     setFormError(undefined)
     setSending(true)
     const message = await onSubmit(name.trim(), phoneDigits(phone))

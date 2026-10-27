@@ -91,6 +91,8 @@ describe('PublicBookingPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar agendamento' }))
     expect(await screen.findByText('Informe seu nome.')).toBeInTheDocument()
     expect(screen.getByText(/Informe DDD \+ número/)).toBeInTheDocument()
+    // O foco vai para o primeiro campo a corrigir.
+    await waitFor(() => expect(screen.getByLabelText(/Seu nome/)).toHaveFocus())
     expect(api.bookAppointment).not.toHaveBeenCalled()
   })
 

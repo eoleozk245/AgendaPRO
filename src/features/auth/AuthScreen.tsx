@@ -1,5 +1,6 @@
 import { MailCheck } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { focusFirstInvalid } from '../../lib/focus.ts'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
 import { Card } from '../../components/Card.tsx'
@@ -39,6 +40,7 @@ export function AuthScreen() {
     const parsed = (isSignUp ? signUpSchema : signInSchema).safeParse({ email, password })
     if (!parsed.success) {
       setFieldErrors(fieldErrorsFrom(parsed.error))
+      focusFirstInvalid(event.currentTarget)
       return
     }
     setFieldErrors({})

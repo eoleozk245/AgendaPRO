@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from 'react'
+import { focusFirstInvalid } from '../../lib/focus.ts'
 import { Link } from 'react-router'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
@@ -66,6 +67,7 @@ export function ProfessionalFormModal({
     const parsed = professionalFormSchema.safeParse(values)
     if (!parsed.success) {
       setNameError(parsed.error.issues[0].message)
+      focusFirstInvalid(event.currentTarget)
       return
     }
     setNameError(undefined)

@@ -1,5 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { focusFirstInvalid } from '../../lib/focus.ts'
 import { Link } from 'react-router'
 import { z } from 'zod'
 import { Alert } from '../../components/Alert.tsx'
@@ -47,6 +48,7 @@ export function SettingsPage() {
     const parsed = nameSchema.safeParse(name)
     if (!parsed.success) {
       setNameError(parsed.error.issues[0].message)
+      focusFirstInvalid(event.currentTarget)
       return
     }
     setNameError(undefined)
