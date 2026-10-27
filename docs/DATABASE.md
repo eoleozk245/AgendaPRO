@@ -25,11 +25,13 @@ Projeto Supabase: `AgendaPRO` (ref `xlafrbbugxypjuuadszg`, região `sa-east-1`).
 
 ## Migrações aplicadas
 
-| Arquivo                                                   | Aplicada no projeto                                                                                                    |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `20261026060000_organizations_and_memberships.sql`        | Sim (26/10/2026, via Supabase MCP)                                                                                     |
-| `20261026080000_services_professionals_hours_clients.sql` | **Não.** A ferramenta pediu confirmação do dono e ficou sem resposta. Testada no PostgreSQL local (`npm run test:db`). |
-| `20261026100000_appointments_and_blocks.sql`              | **Não** (aguarda a anterior). Testada no PostgreSQL local.                                                             |
+| Arquivo                                                   | Aplicada no projeto                                                                                                                                                               |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261026060000_organizations_and_memberships.sql`        | **Sim** (26/10/2026)                                                                                                                                                              |
+| `20261026080000_services_professionals_hours_clients.sql` | **Sim** (27/10/2026, via Supabase MCP). Teste `catalog` (22/22) passou no banco real.                                                                                             |
+| `20261026100000_appointments_and_blocks.sql`              | **Sim** (27/10/2026, via Supabase MCP). O teste `appointments` ainda não rodou no banco real (a ferramenta pediu confirmação sem resposta); passa no PostgreSQL 16 local e no CI. |
+| `20261026120000_public_booking.sql`                       | **Não.** A ferramenta pediu confirmação e ficou sem resposta. Testada no PostgreSQL local e no CI.                                                                                |
+| `20261026130000_foreign_key_indexes.sql`                  | **Não** (índices apontados pelo Advisor; aplicar depois da anterior).                                                                                                             |
 
 O Supabase registra cada migração com o horário em que foi aplicada, então o número de versão no painel pode ser diferente do nome do arquivo. O conteúdo é o mesmo.
 
