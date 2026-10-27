@@ -34,6 +34,25 @@ Não dá para mudar estas configurações pelas ferramentas desta sessão. Elas 
 - O IP vem dos cabeçalhos repassados pelo Supabase (`cf-connecting-ip` / `x-forwarded-for`). Se ele não vier, valem os outros limites.
 - Os horários livres não revelam quem ocupa os outros.
 
+## LGPD (proposta D-019)
+
+**Já existe no código:**
+
+- Clientes guardam só nome, telefone, e-mail e observações; telefone e e-mail são opcionais no painel (`clients`). A reserva pública coleta só nome e telefone.
+- O estabelecimento exclui um cliente pelo painel (Clientes > excluir), com aviso de que os dados pessoais serão apagados.
+- Ao apagar o cliente, os agendamentos ficam com `client_id` nulo (`on delete set null`): o histórico continua, sem vínculo pessoal.
+- `private.booking_attempts` guarda só IP e horário, e as linhas com mais de 24 horas são apagadas a cada reserva.
+- O formulário público avisa: "Usamos seu nome e telefone só para este agendamento e para o estabelecimento falar com você sobre ele."
+- A fonte Inter é servida pelo próprio site, sem enviar o IP do visitante ao Google Fonts.
+
+**Falta (antes de clientes reais):**
+
+- Política de privacidade pública e link dela na página `/{slug}`.
+- Termo com o estabelecimento definindo controlador e operador.
+- Canal de contato para pedidos de titulares e procedimento de incidentes.
+- Anonimização automática por inatividade e exportação dos dados de um cliente.
+- As **observações do agendamento** (`appointments.notes`) não são limpas quando o cliente é apagado. Se tiverem dado pessoal, continuam no histórico.
+
 ## Pendências
 
 - Proteção extra contra robôs na reserva (ex.: CAPTCHA/Turnstile) se aparecer abuso de verdade.

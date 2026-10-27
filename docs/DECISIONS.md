@@ -144,6 +144,22 @@
 - A Vercel continua boa para portfólio, mas para vender exigiria o plano Pro (pago).
 - Nada foi publicado. Publicar expõe o produto ao público e depende da LGPD (D-005).
 
+### D-019 — Retenção e exclusão de dados (LGPD)
+
+**Proposta (precisa da aprovação do Léo).** Sugestão técnica, **não é aconselhamento jurídico**: revisar com alguém da área antes de clientes reais.
+
+- **Papéis:** o estabelecimento é o **controlador** dos dados dos seus clientes; o AgendaPRO é o **operador** (guarda e processa a pedido dele). Do dono da conta, o AgendaPRO é controlador.
+- **Base legal sugerida:** execução de contrato ou procedimentos preliminares (o cliente pede o agendamento).
+- **Dados e finalidade:** nome e telefone (reserva pública e contato sobre o agendamento); e-mail e observações opcionais, só pelo painel; IP das tentativas de reserva, só contra abuso.
+- **Retenção sugerida:**
+  - Tentativas de reserva: 24 horas (já implementado).
+  - Cliente sem agendamento há **24 meses**: anonimizar (sugestão; prazo a definir).
+  - Histórico de agendamentos: mantido sem dado pessoal (já acontece ao apagar o cliente).
+  - Conta do estabelecimento encerrada: apagar tudo em até 30 dias (sugestão).
+- **Direitos do titular hoje:** acesso e correção pelo estabelecimento no painel (Clientes > editar); exclusão em Clientes > excluir. Não existe autoatendimento para o cliente final.
+- **Antes de clientes reais:** política de privacidade pública com link na página `/{slug}`; termo de uso com o estabelecimento (papéis de controlador e operador); canal de contato para pedidos de titulares; registro e procedimento de incidentes.
+- **Implementação futura sugerida:** job periódico de anonimização, exportação dos dados de um cliente (portabilidade e acesso) e limpeza das observações de agendamentos de clientes apagados.
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -160,7 +176,7 @@
 
 - Hospedagem: proposta em D-018 (Cloudflare Pages), aguardando aprovação.
 - Cancelamento e remarcação pelo próprio cliente (hoje só pelo estabelecimento).
-- Política de retenção e exclusão de dados (LGPD).
+- Política de retenção e exclusão de dados (LGPD): proposta em D-019, aguardando aprovação.
 - Playwright como suíte de ponta a ponta no repositório (ver D-017).
 - Componente de menu suspenso: criar quando uma tela precisar.
 - Busca e paginação de clientes no servidor quando a lista crescer.
