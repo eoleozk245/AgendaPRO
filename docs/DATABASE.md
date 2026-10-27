@@ -48,7 +48,7 @@ Resultados da última execução estão em `docs/STATUS.md`.
 
 ## Dados de teste
 
-O usuário `teste-e2e@exemplo.test` (fictício) existe no projeto para os testes de ponta a ponta. Pode ser apagado a qualquer momento em Authentication > Users.
+O usuário `teste-e2e@exemplo.test` (fictício) existe no projeto para os testes de ponta a ponta, com o estabelecimento "Barbearia Exemplo E2E", o serviço "Corte Exemplo", o horário de quarta 09:00–18:00, o cliente "Cliente Exemplo E2E" e um agendamento em 28/10/2026. Tudo pode ser apagado a qualquer momento: apagar o usuário em Authentication > Users não apaga o estabelecimento, que precisa ser removido à parte.
 
 ## Avisos do Advisor aceitos
 
