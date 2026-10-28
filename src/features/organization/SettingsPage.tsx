@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
 import { Card } from '../../components/Card.tsx'
+import { Checkbox } from '../../components/Checkbox.tsx'
 import { PageHeader } from '../../components/PageHeader.tsx'
 import { SelectField } from '../../components/SelectField.tsx'
 import { TextField } from '../../components/TextField.tsx'
@@ -26,6 +27,15 @@ const MIN_NOTICE_OPTIONS = [
   { value: 2880, label: '2 dias' },
 ]
 const MAX_DAYS_OPTIONS = [7, 14, 30, 60, 90]
+const CLIENT_NOTICE_OPTIONS = [
+  { value: 0, label: 'Até o horário marcado' },
+  { value: 60, label: 'Até 1 hora antes' },
+  { value: 120, label: 'Até 2 horas antes' },
+  { value: 240, label: 'Até 4 horas antes' },
+  { value: 720, label: 'Até 12 horas antes' },
+  { value: 1440, label: 'Até 1 dia antes' },
+  { value: 2880, label: 'Até 2 dias antes' },
+]
 
 const nameSchema = z
   .string()
@@ -39,6 +49,8 @@ export function SettingsPage() {
   const [timezone, setTimezone] = useState(organization.timezone)
   const [minNotice, setMinNotice] = useState(organization.booking_min_notice_minutes)
   const [maxDays, setMaxDays] = useState(organization.booking_max_days_ahead)
+  const [clientChanges, setClientChanges] = useState(organization.client_changes_enabled)
+  const [clientNotice, setClientNotice] = useState(organization.client_change_min_notice_minutes)
   const [nameError, setNameError] = useState<string>()
   const [result, setResult] = useState<{ tone: 'success' | 'error'; text: string }>()
   const [saving, setSaving] = useState(false)
@@ -61,6 +73,8 @@ export function SettingsPage() {
           timezone,
           booking_min_notice_minutes: minNotice,
           booking_max_days_ahead: maxDays,
+          client_changes_enabled: clientChanges,
+          client_change_min_notice_minutes: clientNotice,
         }),
       )
       setResult({ tone: 'success', text: 'Dados salvos.' })
@@ -70,6 +84,13 @@ export function SettingsPage() {
       setSaving(false)
     }
   }
+
+  const clientNoticeOptions = CLIENT_NOTICE_OPTIONS.some((option) => option.value === clientNotice)
+    ? CLIENT_NOTICE_OPTIONS
+    : [
+        { value: clientNotice, label: `Até ${clientNotice} minutos antes` },
+        ...CLIENT_NOTICE_OPTIONS,
+      ]
 
   const timezoneOptions = BRAZIL_TIMEZONES.some((option) => option.value === timezone)
     ? BRAZIL_TIMEZONES
@@ -140,6 +161,26 @@ export function SettingsPage() {
               {MAX_DAYS_OPTIONS.map((days) => (
                 <option key={days} value={days}>
                   {days} dias à frente
+                </option>
+              ))}
+            </SelectField>
+            <h2 className={styles.sectionTitle}>Cancelamento e remarcação pelo cliente</h2>
+            <Checkbox
+              label="O cliente pode cancelar ou remarcar pelo link do agendamento"
+              hint="O link aparece para o cliente quando ele reserva pela página de agendamento."
+              checked={clientChanges}
+              onChange={(event) => setClientChanges(event.target.checked)}
+            />
+            <SelectField
+              label="Prazo para mudar pelo link"
+              value={clientNotice}
+              disabled={!clientChanges}
+              onChange={(event) => setClientNotice(Number(event.target.value))}
+              hint="Depois do prazo, o cliente precisa falar com você."
+            >
+              {clientNoticeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </SelectField>

@@ -9,6 +9,8 @@ export async function updateOrganization(
     timezone: string
     booking_min_notice_minutes: number
     booking_max_days_ahead: number
+    client_changes_enabled: boolean
+    client_change_min_notice_minutes: number
   },
 ): Promise<Organization> {
   const { data, error } = await supabase
