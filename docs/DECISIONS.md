@@ -195,6 +195,24 @@
 - **Sem desfoque ou com "reduzir transparência":** as superfícies voltam a ser sólidas.
 - **Custo conhecido:** o desfoque usa mais a placa de vídeo. Por isso há poucas camadas de vidro por tela e nenhuma em listas longas.
 
+### D-022 — Cliente cancela ou remarca pelo link
+
+**Escopo confirmado pelo Léo** (27/10/2026: "Cliente cancela/remarca" é o segundo item da Etapa 7, em PR separado). **Detalhes por delegação.** Resolve a pendência que a D-016 deixou.
+
+- **Link privado:** a reserva pública gera um código aleatório de 256 bits (`gen_random_bytes`), e o banco guarda **só o hash** (SHA-256). O código aparece uma vez, na confirmação da reserva, com botões para copiar e abrir.
+- **O código vai depois do `#`** (`/{slug}/meu-agendamento#código`). Essa parte do endereço nunca vai para o servidor, então não aparece em log da Vercel nem no cabeçalho "Referer".
+- **Quem tem o link manda no agendamento.** É o mesmo modelo de um link de convite: a tela avisa para não compartilhar. Agendamento feito no painel não tem link.
+- **Funções no banco** (o público continua sem tocar nas tabelas, D-008): `get_client_booking`, `get_client_reschedule_slots`, `cancel_client_booking` e `reschedule_client_booking`.
+- **Regras:**
+  - só agendamentos pendentes ou confirmados;
+  - dentro do prazo do estabelecimento ("Estabelecimento > Cancelamento e remarcação pelo cliente"; padrão: até 2 horas antes), que pode ser desligado;
+  - remarcar usa o mesmo serviço, o mesmo profissional e a **duração guardada na reserva** (se o dono mudar a duração do serviço depois, vale a reservada), só em horário livre de verdade, com a antecedência e o limite de dias da reserva;
+  - a situação não muda: confirmado continua confirmado;
+  - **até 3 remarcações por agendamento.** O limite é por agendamento, e não por IP ou estabelecimento, para que ninguém sem o código consiga gastá-lo. Depois do limite, ou se o profissional ou o serviço for desativado, o link só oferece cancelar.
+- **Validade do link:** deixa de valer se o cliente for excluído (LGPD) e 30 dias depois do horário. Horário que já passou mostra "Este horário já passou".
+- **O link mostra só o necessário:** serviço, profissional, horário, valor, situação e prazo. Nada de telefone nem de nome.
+- **Fora desta etapa:** avisar o estabelecimento quando o cliente cancela ou remarca (entra com e-mails, na 7c); enviar o link por e-mail ou WhatsApp; trocar de serviço ou profissional pelo link.
+
 ## Escopo do MVP
 
 **Dentro:**
@@ -209,7 +227,6 @@
 
 ## Pendente
 
-- Cancelamento e remarcação pelo próprio cliente (hoje só pelo estabelecimento).
 - Escolher os profissionais no formulário do serviço (proposta em D-020).
 - Política de retenção e exclusão de dados (LGPD): proposta em D-019, aguardando aprovação.
 - Componente de menu suspenso: criar quando uma tela precisar.
@@ -217,7 +234,7 @@
 
 ## Fora do MVP
 
-Administração global da plataforma, cancelamento pelo cliente na página pública, e-mails e lembretes, pagamentos e sinal, lista de espera, agendamentos recorrentes, planos e assinaturas, tabelas `notifications` e `audit_logs` (entram junto com e-mails e auditoria).
+Administração global da plataforma, e-mails e lembretes, pagamentos e sinal, lista de espera, agendamentos recorrentes, planos e assinaturas, tabelas `notifications` e `audit_logs` (entram junto com e-mails e auditoria).
 
 ## Roadmap
 

@@ -37,6 +37,16 @@ Não dá para mudar estas configurações pelas ferramentas desta sessão. Elas 
 - O IP vem dos cabeçalhos repassados pelo Supabase (`cf-connecting-ip` / `x-forwarded-for`). Se ele não vier, valem os outros limites.
 - Os horários livres não revelam quem ocupa os outros.
 
+## Link do cliente (D-022)
+
+- O código do link tem 256 bits aleatórios (`gen_random_bytes(32)` do pgcrypto). O banco guarda só o **hash SHA-256**: quem ler a tabela não consegue montar o link.
+- O código fica depois do `#` no endereço. Navegadores não enviam essa parte ao servidor, então ela fica fora dos logs e do `Referer`.
+- O link mostra só serviço, profissional, horário, valor, situação e prazo, sem telefone e sem nome.
+- Cancelar e remarcar passam por funções no banco, que conferem código, situação e prazo. Remarcar também confere horário livre (com a duração reservada) e tem **limite de 3 por agendamento**. O limite não é por IP nem por estabelecimento, de propósito: quem não tem o código não consegue gastá-lo nem bloquear a remarcação de outra pessoa.
+- O link deixa de valer se o cliente for excluído e 30 dias depois do horário. Assim ele não fica mostrando dados para sempre.
+- **Risco aceito:** quem tiver o link consegue cancelar ou remarcar. A tela de confirmação avisa para não compartilhar. Com 256 bits, adivinhar um código não é viável.
+- **Funções novas no schema `public` do Supabase nascem executáveis por `anon`.** Toda função que não deve ser pública fica no schema `private`, ou tem `execute` revogado explicitamente de `anon`.
+
 ## LGPD (proposta D-019)
 
 **Já existe no código:**
@@ -57,6 +67,8 @@ Não dá para mudar estas configurações pelas ferramentas desta sessão. Elas 
 - As **observações do agendamento** (`appointments.notes`) não são limpas quando o cliente é apagado. Se tiverem dado pessoal, continuam no histórico.
 
 ## Pendências
+
+- **Conferir em produção qual cabeçalho de IP chega ao banco** (`cf-connecting-ip` ou `x-forwarded-for`). Se só vier o `x-forwarded-for`, o primeiro item pode ser escrito por quem chama, e o limite por IP da reserva fica fácil de contornar. Já o limite por estabelecimento (30 por minuto) pode ser esgotado de propósito, bloqueando as reservas daquele estabelecimento por instantes. Isso já existia desde a D-016. Se acontecer, trocar para um limite por telefone ou adicionar CAPTCHA.
 
 - Proteção extra contra robôs na reserva (ex.: CAPTCHA/Turnstile) se aparecer abuso de verdade.
 - LGPD antes de uso com clientes reais (ver `DECISIONS.md`).

@@ -11,6 +11,8 @@ const api = vi.hoisted(() => ({
 }))
 vi.mock('./api.ts', () => api)
 
+const TOKEN = 'aB3_-xYz0123456789abcdefghijklmnopqrstuvwxy'
+
 const page: PublicPage = {
   organization: {
     name: 'Barbearia Exemplo',
@@ -107,6 +109,8 @@ describe('PublicBookingPage', () => {
         price_cents: 4500,
         status: 'pending',
       },
+      manage_token: TOKEN,
+      changes: { enabled: true, deadline: '2030-01-07T15:30:00Z' },
     })
     renderPage()
     await chooseUntilSlot()
@@ -120,6 +124,17 @@ describe('PublicBookingPage', () => {
     expect(screen.getByText('segunda-feira, 7 de janeiro às 14:30')).toBeInTheDocument()
     expect(screen.getByText('Profissional Exemplo')).toBeInTheDocument()
     expect(screen.getByText('Aguardando confirmação')).toBeInTheDocument()
+    // Link do cliente: só aparece aqui, com prazo no fuso do estabelecimento.
+    expect(screen.getByLabelText('Link')).toHaveValue(
+      `${window.location.origin}/barbearia-exemplo/meu-agendamento#${TOKEN}`,
+    )
+    expect(
+      screen.getByText(/cancela ou remarca até segunda-feira, 7 de janeiro às 12:30/),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Abrir meu agendamento' })).toHaveAttribute(
+      'href',
+      `/barbearia-exemplo/meu-agendamento#${TOKEN}`,
+    )
     expect(api.bookAppointment).toHaveBeenCalledWith({
       slug: 'barbearia-exemplo',
       serviceId: 's1',
@@ -149,6 +164,8 @@ describe('PublicBookingPage', () => {
         price_cents: 4500,
         status: 'pending',
       },
+      manage_token: TOKEN,
+      changes: { enabled: true, deadline: '2030-01-07T15:30:00Z' },
     })
     renderPage()
     fireEvent.click(await screen.findByRole('radio', { name: /Corte/ }))

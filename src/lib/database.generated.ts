@@ -2,6 +2,9 @@
 // Só os tipos auxiliares genéricos do gerador (Tables<>, Enums<>...), que o projeto
 // não usa, foram omitidos. Não edite à mão: gere de novo depois de cada migração.
 // As exceções (colunas preenchidas por trigger) ficam em database.types.ts.
+// PENDENTE: as partes das Etapas 7a e 7b (set_professional_services, link do
+// cliente) foram escritas à mão no formato do gerador, porque as migrações ainda
+// não estão no banco real. Gere de novo depois de aplicá-las.
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
@@ -16,6 +19,7 @@ export type Database = {
         Row: {
           cancelled_at: string | null
           client_id: string | null
+          client_token_hash: string | null
           created_at: string
           duration_minutes: number
           ends_at: string
@@ -34,6 +38,7 @@ export type Database = {
         Insert: {
           cancelled_at?: string | null
           client_id?: string | null
+          client_token_hash?: string | null
           created_at?: string
           duration_minutes: number
           ends_at: string
@@ -52,6 +57,7 @@ export type Database = {
         Update: {
           cancelled_at?: string | null
           client_id?: string | null
+          client_token_hash?: string | null
           created_at?: string
           duration_minutes?: number
           ends_at?: string
@@ -252,6 +258,8 @@ export type Database = {
         Row: {
           booking_max_days_ahead: number
           booking_min_notice_minutes: number
+          client_change_min_notice_minutes: number
+          client_changes_enabled: boolean
           created_at: string
           id: string
           name: string
@@ -262,6 +270,8 @@ export type Database = {
         Insert: {
           booking_max_days_ahead?: number
           booking_min_notice_minutes?: number
+          client_change_min_notice_minutes?: number
+          client_changes_enabled?: boolean
           created_at?: string
           id?: string
           name: string
@@ -272,6 +282,8 @@ export type Database = {
         Update: {
           booking_max_days_ahead?: number
           booking_min_notice_minutes?: number
+          client_change_min_notice_minutes?: number
+          client_changes_enabled?: boolean
           created_at?: string
           id?: string
           name?: string
@@ -409,11 +421,14 @@ export type Database = {
         }
         Returns: Json
       }
+      cancel_client_booking: { Args: { p_token: string }; Returns: Json }
       create_organization: {
         Args: { org_name: string; org_slug: string }
         Returns: {
           booking_max_days_ahead: number
           booking_min_notice_minutes: number
+          client_change_min_notice_minutes: number
+          client_changes_enabled: boolean
           created_at: string
           id: string
           name: string
@@ -439,7 +454,18 @@ export type Database = {
           starts_at: string
         }[]
       }
+      get_client_booking: { Args: { p_token: string }; Returns: Json }
+      get_client_reschedule_slots: {
+        Args: { p_date: string; p_token: string }
+        Returns: {
+          starts_at: string
+        }[]
+      }
       get_public_booking_page: { Args: { p_slug: string }; Returns: Json }
+      reschedule_client_booking: {
+        Args: { p_starts_at: string; p_token: string }
+        Returns: Json
+      }
       set_professional_services: {
         Args: { p_professional_id: string; p_service_ids: string[] }
         Returns: undefined

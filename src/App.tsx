@@ -9,6 +9,7 @@ import { ClientsPage } from './features/clients/ClientsPage.tsx'
 import { SettingsPage } from './features/organization/SettingsPage.tsx'
 import { PanelGate } from './features/panel/PanelGate.tsx'
 import { PanelLayout } from './features/panel/PanelLayout.tsx'
+import { ManageBookingPage } from './features/public-booking/ManageBookingPage.tsx'
 import { PublicBookingPage } from './features/public-booking/PublicBookingPage.tsx'
 import { ServicesPage } from './features/services/ServicesPage.tsx'
 import { TeamPage } from './features/team/TeamPage.tsx'
@@ -34,8 +35,9 @@ function App() {
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
-      {/* Página pública do estabelecimento: layout próprio, sem login. */}
+      {/* Páginas públicas do estabelecimento: layout próprio, sem login. */}
       <Route path="/:slug" element={<PublicBookingPage />} />
+      <Route path="/:slug/meu-agendamento" element={<ManageBookingPage />} />
     </Routes>
   )
 }

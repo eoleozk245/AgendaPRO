@@ -29,7 +29,7 @@ const TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
 }
 
 export function isAppointmentStatus(value: string): value is AppointmentStatus {
-  return value in TRANSITIONS
+  return Object.hasOwn(TRANSITIONS, value)
 }
 
 export function nextStatuses(status: AppointmentStatus): AppointmentStatus[] {

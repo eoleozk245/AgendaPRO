@@ -1,0 +1,52 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.notice:focus {
+  outline: none;
+}
+
+.deadline {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.reschedule {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.subtitle {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.subtitle:focus {
+  outline: none;
+}
+
+@media (max-width: 480px) {
+  .actions > * {
+    flex: 1;
+  }
+}
+
+.refreshError {
+  margin-bottom: var(--space-5);
+}

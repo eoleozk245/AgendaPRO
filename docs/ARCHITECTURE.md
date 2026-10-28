@@ -35,16 +35,17 @@ Cada feature costuma ter: `api.ts` (chamadas ao Supabase, com erros traduzidos),
 
 ## Rotas
 
-| Rota                      | Quem acessa     | Tela                                   |
-| ------------------------- | --------------- | -------------------------------------- |
-| `/entrar`                 | Visitante       | Entrar / criar conta                   |
-| `/painel`                 | Dono logado     | Agenda (dia e semana)                  |
-| `/painel/servicos`        | Dono logado     | Serviços                               |
-| `/painel/equipe`          | Dono logado     | Profissionais e os serviços de cada um |
-| `/painel/horarios`        | Dono logado     | Horário de funcionamento               |
-| `/painel/clientes`        | Dono logado     | Clientes                               |
-| `/painel/estabelecimento` | Dono logado     | Dados, fuso, regras de reserva         |
-| `/{slug}`                 | Qualquer pessoa | Página pública de agendamento          |
+| Rota                             | Quem acessa     | Tela                                           |
+| -------------------------------- | --------------- | ---------------------------------------------- |
+| `/entrar`                        | Visitante       | Entrar / criar conta                           |
+| `/painel`                        | Dono logado     | Agenda (dia e semana)                          |
+| `/painel/servicos`               | Dono logado     | Serviços                                       |
+| `/painel/equipe`                 | Dono logado     | Profissionais e os serviços de cada um         |
+| `/painel/horarios`               | Dono logado     | Horário de funcionamento                       |
+| `/painel/clientes`               | Dono logado     | Clientes                                       |
+| `/painel/estabelecimento`        | Dono logado     | Dados, fuso, regras de reserva                 |
+| `/{slug}`                        | Qualquer pessoa | Página pública de agendamento                  |
+| `/{slug}/meu-agendamento#código` | Quem tem o link | Ver, cancelar e remarcar o agendamento (D-022) |
 
 Sem sessão, o painel manda para `/entrar`. Sem estabelecimento, mostra o cadastro do estabelecimento. Esconder a tela não é a proteção: os dados só saem do banco se a RLS permitir.
 

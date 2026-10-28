@@ -1,27 +1,21 @@
-import { CalendarX, CircleCheck, Clock } from 'lucide-react'
+import { CircleCheck, Clock } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { focusFirstInvalid } from '../../lib/focus.ts'
 import { Alert } from '../../components/Alert.tsx'
 import { Button } from '../../components/Button.tsx'
 import { Card } from '../../components/Card.tsx'
-import { LoadingState } from '../../components/LoadingState.tsx'
 import { TextField } from '../../components/TextField.tsx'
 import { formatDuration } from '../../lib/duration.ts'
 import { formatCents } from '../../lib/money.ts'
 import { formatPhone, isValidPhone, phoneDigits } from '../../lib/phone.ts'
 import { formatDayLabel, todayIn, utcToZoned } from '../../lib/timezone.ts'
-import { useAsyncData } from '../../lib/useAsyncData.ts'
 import { bookAppointment, fetchSlots, type PublicPage } from './api.ts'
 import styles from './BookingFlow.module.css'
 import { bookableDates } from './dates.ts'
-
-const QUICK_DATES = 14
-const dateChip = new Intl.DateTimeFormat('pt-BR', {
-  timeZone: 'UTC',
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-})
+import { CLIENT_STATUS_LABEL } from './client-status.ts'
+import { DatePicker } from './DatePicker.tsx'
+import { ManageLink } from './ManageLink.tsx'
+import { SlotPicker } from './SlotPicker.tsx'
 
 type Booked = {
   startsAt: string
@@ -29,6 +23,8 @@ type Booked = {
   priceCents: number
   durationMinutes: number
   professionalName?: string
+  manageToken: string
+  changes: { enabled: boolean; deadline: string }
 }
 
 export function BookingFlow({ page }: { page: PublicPage }) {
@@ -55,6 +51,7 @@ export function BookingFlow({ page }: { page: PublicPage }) {
     return (
       <BookingSuccess
         booked={booked}
+        slug={organization.slug}
         timeZone={timeZone}
         onRestart={() => {
           setBooked(undefined)
@@ -146,54 +143,24 @@ export function BookingFlow({ page }: { page: PublicPage }) {
       )}
 
       {service && effectiveProfessionalId && (
-        <fieldset className={styles.step}>
-          <legend className={styles.legend}>
-            {serviceProfessionals.length > 1 ? '3.' : '2.'} Escolha o dia
-          </legend>
+        <DatePicker
+          legend={`${serviceProfessionals.length > 1 ? '3.' : '2.'} Escolha o dia`}
+          today={today}
+          dates={dates}
+          value={date}
+          onChange={(option) => {
+            setDate(option)
+            setStartsAt(undefined)
+          }}
+        >
           {serviceProfessionals.length === 1 && (
             <p className={styles.with}>Com {serviceProfessionals[0].name}</p>
           )}
-          <div className={styles.dates}>
-            {dates.slice(0, QUICK_DATES).map((option) => (
-              <label key={option} className={styles.dateChip}>
-                <input
-                  type="radio"
-                  name="date"
-                  value={option}
-                  checked={date === option}
-                  onChange={() => {
-                    setDate(option)
-                    setStartsAt(undefined)
-                  }}
-                  className={`visually-hidden ${styles.radio}`}
-                />
-                <span className={styles.dateFace}>
-                  {option === today ? 'Hoje' : dateChip.format(new Date(`${option}T00:00:00Z`))}
-                </span>
-              </label>
-            ))}
-          </div>
-          {dates.length > QUICK_DATES && (
-            <TextField
-              className={styles.otherDate}
-              label="Outra data"
-              type="date"
-              min={today}
-              max={dates[dates.length - 1]}
-              value={date && !dates.slice(0, QUICK_DATES).includes(date) ? date : ''}
-              onChange={(event) => {
-                if (dates.includes(event.target.value)) {
-                  setDate(event.target.value)
-                  setStartsAt(undefined)
-                }
-              }}
-            />
-          )}
-        </fieldset>
+        </DatePicker>
       )}
 
       {service && effectiveProfessionalId && date && (
-        <SlotPicker
+        <ServiceSlots
           key={`${service.id}-${effectiveProfessionalId}-${date}`}
           slug={organization.slug}
           serviceId={service.id}
@@ -233,6 +200,8 @@ export function BookingFlow({ page }: { page: PublicPage }) {
                 priceCents: result.appointment.price_cents,
                 durationMinutes: service.duration_minutes,
                 professionalName,
+                manageToken: result.manage_token,
+                changes: result.changes,
               })
               return undefined
             }
@@ -244,7 +213,7 @@ export function BookingFlow({ page }: { page: PublicPage }) {
   )
 }
 
-function SlotPicker({
+function ServiceSlots({
   slug,
   serviceId,
   professionalId,
@@ -267,43 +236,14 @@ function SlotPicker({
     () => fetchSlots(slug, serviceId, professionalId, date),
     [slug, serviceId, professionalId, date],
   )
-  const { state, retry } = useAsyncData(load)
-
   return (
-    <fieldset className={styles.step}>
-      <legend className={styles.legend}>{step}. Escolha o horário</legend>
-      {state.status === 'loading' && <LoadingState label="Buscando horários livres" />}
-      {state.status === 'error' && (
-        <Alert tone="error" title="Não foi possível buscar os horários.">
-          <Button variant="secondary" size="sm" onClick={retry}>
-            Tentar de novo
-          </Button>
-        </Alert>
-      )}
-      {state.status === 'ready' && state.data.length === 0 && (
-        <div className={styles.noSlots}>
-          <CalendarX size={24} aria-hidden="true" />
-          <p>Nenhum horário livre neste dia. Tente outra data.</p>
-        </div>
-      )}
-      {state.status === 'ready' && state.data.length > 0 && (
-        <div className={styles.slots}>
-          {state.data.map((slot) => (
-            <label key={slot} className={styles.slot}>
-              <input
-                type="radio"
-                name="slot"
-                value={slot}
-                checked={value === slot}
-                onChange={() => onChange(slot)}
-                className={`visually-hidden ${styles.radio}`}
-              />
-              <span className={styles.slotFace}>{utcToZoned(slot, timeZone).time}</span>
-            </label>
-          ))}
-        </div>
-      )}
-    </fieldset>
+    <SlotPicker
+      legend={`${step}. Escolha o horário`}
+      timeZone={timeZone}
+      load={load}
+      value={value}
+      onChange={onChange}
+    />
   )
 }
 
@@ -380,10 +320,12 @@ function ContactStep({
 
 function BookingSuccess({
   booked,
+  slug,
   timeZone,
   onRestart,
 }: {
   booked: Booked
+  slug: string
   timeZone: string
   onRestart: () => void
 }) {
@@ -423,9 +365,15 @@ function BookingSuccess({
         </div>
         <div>
           <dt>Situação</dt>
-          <dd>Aguardando confirmação</dd>
+          <dd>{CLIENT_STATUS_LABEL.pending}</dd>
         </div>
       </dl>
+      <ManageLink
+        slug={slug}
+        token={booked.manageToken}
+        timeZone={timeZone}
+        changes={booked.changes}
+      />
       <Button variant="secondary" onClick={onRestart}>
         Fazer outro agendamento
       </Button>
