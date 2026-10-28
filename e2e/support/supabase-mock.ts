@@ -15,6 +15,8 @@ export const organization = {
   timezone: 'America/Sao_Paulo',
   booking_min_notice_minutes: 120,
   booking_max_days_ahead: 60,
+  client_changes_enabled: true,
+  client_change_min_notice_minutes: 120,
   created_at: now,
   updated_at: now,
 }

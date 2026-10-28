@@ -13,6 +13,7 @@ import { bookAppointment, fetchSlots, type PublicPage } from './api.ts'
 import styles from './BookingFlow.module.css'
 import { bookableDates } from './dates.ts'
 import { DatePicker } from './DatePicker.tsx'
+import { ManageLink } from './ManageLink.tsx'
 import { SlotPicker } from './SlotPicker.tsx'
 
 type Booked = {
@@ -21,6 +22,8 @@ type Booked = {
   priceCents: number
   durationMinutes: number
   professionalName?: string
+  manageToken: string
+  changes: { enabled: boolean; deadline: string }
 }
 
 export function BookingFlow({ page }: { page: PublicPage }) {
@@ -47,6 +50,7 @@ export function BookingFlow({ page }: { page: PublicPage }) {
     return (
       <BookingSuccess
         booked={booked}
+        slug={organization.slug}
         timeZone={timeZone}
         onRestart={() => {
           setBooked(undefined)
@@ -195,6 +199,8 @@ export function BookingFlow({ page }: { page: PublicPage }) {
                 priceCents: result.appointment.price_cents,
                 durationMinutes: service.duration_minutes,
                 professionalName,
+                manageToken: result.manage_token,
+                changes: result.changes,
               })
               return undefined
             }
@@ -313,10 +319,12 @@ function ContactStep({
 
 function BookingSuccess({
   booked,
+  slug,
   timeZone,
   onRestart,
 }: {
   booked: Booked
+  slug: string
   timeZone: string
   onRestart: () => void
 }) {
@@ -359,6 +367,12 @@ function BookingSuccess({
           <dd>Aguardando confirmação</dd>
         </div>
       </dl>
+      <ManageLink
+        slug={slug}
+        token={booked.manageToken}
+        timeZone={timeZone}
+        changes={booked.changes}
+      />
       <Button variant="secondary" onClick={onRestart}>
         Fazer outro agendamento
       </Button>
