@@ -120,6 +120,8 @@ const clientBookingSchema = z.object({
     deadline: z.string(),
     /** Por que não dá para mudar pelo link; null quando dá. */
     problem: z.string().nullable(),
+    /** Quantas remarcações pelo link ainda restam (limite por agendamento). */
+    reschedules_left: z.number(),
   }),
 })
 

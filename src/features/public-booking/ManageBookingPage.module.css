@@ -20,6 +20,9 @@
 }
 
 .link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height-sm);
   font-weight: var(--weight-semibold);
 }
 
@@ -42,4 +45,8 @@
   .actions > * {
     flex: 1;
   }
+}
+
+.refreshError {
+  margin-bottom: var(--space-5);
 }

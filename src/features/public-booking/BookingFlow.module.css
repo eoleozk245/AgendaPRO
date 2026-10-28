@@ -275,6 +275,9 @@
 }
 
 .manageOpen {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height-sm);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
 }

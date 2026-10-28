@@ -31,7 +31,12 @@ const booking: ClientBooking = {
     price_cents: 4500,
     professional_name: 'Ana Exemplo',
   },
-  changes: { enabled: true, deadline: '2030-01-08T11:00:00Z', problem: null },
+  changes: {
+    enabled: true,
+    deadline: '2030-01-08T11:00:00Z',
+    problem: null,
+    reschedules_left: 3,
+  },
 }
 
 function renderPage(hash = `#${TOKEN}`) {
@@ -168,5 +173,76 @@ describe('ManageBookingPage', () => {
     renderPage()
     fireEvent.click(await screen.findByRole('button', { name: 'Tentar de novo' }))
     expect(await screen.findByRole('heading', { level: 1, name: 'Seu agendamento' })).toBeVisible()
+  })
+
+  describe('depois da revisão', () => {
+    it('"Pular para o conteúdo" não apaga o código do link', async () => {
+      renderPage()
+      await screen.findByRole('heading', { level: 1, name: 'Seu agendamento' })
+      fireEvent.click(screen.getByRole('link', { name: 'Pular para o conteúdo' }))
+      expect(screen.getByRole('main')).toHaveFocus()
+      expect(screen.getByRole('heading', { level: 1, name: 'Seu agendamento' })).toBeVisible()
+      expect(api.fetchClientBooking).toHaveBeenCalledTimes(1)
+    })
+
+    it('recusa do banco atualiza a página (o prazo pode ter vencido)', async () => {
+      api.cancelClientBooking.mockResolvedValue({ ok: false, message: 'O prazo passou.' })
+      renderPage()
+      fireEvent.click(await screen.findByRole('button', { name: 'Cancelar agendamento' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Sim, cancelar' }))
+      await waitFor(() => expect(api.fetchClientBooking).toHaveBeenCalledTimes(2))
+    })
+
+    it('se a atualização falhar depois de cancelar, o aviso de sucesso continua', async () => {
+      api.fetchClientBooking.mockResolvedValueOnce(booking).mockRejectedValue(new Error('rede'))
+      api.cancelClientBooking.mockResolvedValue({ ok: true })
+      renderPage()
+      fireEvent.click(await screen.findByRole('button', { name: 'Cancelar agendamento' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Sim, cancelar' }))
+      expect(await screen.findByText('Não foi possível atualizar a situação.')).toBeInTheDocument()
+      expect(screen.getByText(/Agendamento cancelado/)).toBeInTheDocument()
+      expect(screen.getByText('Ana Exemplo')).toBeInTheDocument()
+    })
+
+    it('"Voltar" devolve o foco ao botão Remarcar', async () => {
+      renderPage()
+      fireEvent.click(await screen.findByRole('button', { name: 'Remarcar' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Remarcar' })).toHaveFocus())
+    })
+
+    it('sem remarcações restantes, só oferece cancelar e explica', async () => {
+      api.fetchClientBooking.mockResolvedValue({
+        ...booking,
+        changes: { ...booking.changes, reschedules_left: 0 },
+      })
+      renderPage()
+      expect(await screen.findByText(/Já não dá para remarcar pelo link/)).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Remarcar' })).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Cancelar agendamento' })).toBeInTheDocument()
+    })
+
+    it('avisa quando o novo horário já fica dentro do prazo', async () => {
+      // Prazo de 2 h; 10:30 de hoje (São Paulo) fica a 1h30 do "agora" do teste.
+      api.fetchRescheduleSlots.mockResolvedValue(['2030-01-07T13:30:00Z'])
+      renderPage()
+      fireEvent.click(await screen.findByRole('button', { name: 'Remarcar' }))
+      fireEvent.click(screen.getByRole('radio', { name: 'Hoje' }))
+      fireEvent.click(await screen.findByRole('radio', { name: '10:30' }))
+      expect(screen.getByText('Depois deste, não dá mais para mudar pelo link')).toBeInTheDocument()
+    })
+
+    it('trocar de horário apaga o erro anterior', async () => {
+      api.fetchRescheduleSlots.mockResolvedValue(['2030-01-09T17:30:00Z', '2030-01-09T17:45:00Z'])
+      api.rescheduleClientBooking.mockResolvedValue({ ok: false, message: 'Horário recusado.' })
+      renderPage()
+      fireEvent.click(await screen.findByRole('button', { name: 'Remarcar' }))
+      fireEvent.click(screen.getByRole('radio', { name: /^\S+ 9 de jan/ }))
+      fireEvent.click(await screen.findByRole('radio', { name: '14:30' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Confirmar novo horário' }))
+      expect(await screen.findByText('Horário recusado.')).toBeInTheDocument()
+      fireEvent.click(await screen.findByRole('radio', { name: '14:45' }))
+      expect(screen.queryByText('Horário recusado.')).not.toBeInTheDocument()
+    })
   })
 })

@@ -5,8 +5,11 @@ export function manageBookingPath(slug: string, token: string): string {
   return `/${slug}/meu-agendamento#${token}`
 }
 
-/** Lê o código do "#" do endereço. Vazio se não houver um código plausível. */
+/**
+ * Lê o código do "#" do endereço. Ignora pontuação colada no fim (comum quando
+ * o link é colado numa mensagem). Vazio se não houver um código plausível.
+ */
 export function tokenFromHash(hash: string): string {
-  const token = hash.replace(/^#/, '')
+  const token = hash.replace(/^#/, '').replace(/[.,;:!?)\]]+$/, '')
   return /^[A-Za-z0-9_-]{20,100}$/.test(token) ? token : ''
 }

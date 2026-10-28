@@ -183,6 +183,7 @@ function clientBooking() {
       enabled: true,
       deadline: new Date(Date.parse(startsAt) - 120 * 60_000).toISOString(),
       problem: null,
+      reschedules_left: 3,
     },
   }
 }

@@ -14,6 +14,10 @@ describe('link do cliente', () => {
     expect(tokenFromHash(`#${token}`)).toBe(token)
   })
 
+  it.each(['.', ',', ').', '!'])('ignora pontuação colada no fim (%j)', (end) => {
+    expect(tokenFromHash(`#${token}${end}`)).toBe(token)
+  })
+
   it.each(['', '#', '#curto', `#${token}<script>`, `#${token} `])('recusa %j', (hash) => {
     expect(tokenFromHash(hash)).toBe('')
   })

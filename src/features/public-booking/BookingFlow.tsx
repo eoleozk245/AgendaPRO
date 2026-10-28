@@ -12,6 +12,7 @@ import { formatDayLabel, todayIn, utcToZoned } from '../../lib/timezone.ts'
 import { bookAppointment, fetchSlots, type PublicPage } from './api.ts'
 import styles from './BookingFlow.module.css'
 import { bookableDates } from './dates.ts'
+import { CLIENT_STATUS_LABEL } from './client-status.ts'
 import { DatePicker } from './DatePicker.tsx'
 import { ManageLink } from './ManageLink.tsx'
 import { SlotPicker } from './SlotPicker.tsx'
@@ -364,7 +365,7 @@ function BookingSuccess({
         </div>
         <div>
           <dt>Situação</dt>
-          <dd>Aguardando confirmação</dd>
+          <dd>{CLIENT_STATUS_LABEL.pending}</dd>
         </div>
       </dl>
       <ManageLink

@@ -9,7 +9,15 @@ export function PublicShell({ name, children }: { name?: string; children: React
   const { preference, setPreference } = useTheme()
   return (
     <div className={styles.page}>
-      <a href="#conteudo" className="skip-link">
+      {/* Foca o conteúdo sem trocar o "#" do endereço: na página do link, ele guarda o código. */}
+      <a
+        href="#conteudo"
+        className="skip-link"
+        onClick={(event) => {
+          event.preventDefault()
+          document.getElementById('conteudo')?.focus()
+        }}
+      >
         Pular para o conteúdo
       </a>
       <header className={styles.header}>

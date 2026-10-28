@@ -83,3 +83,25 @@ test.describe('no celular, tema escuro', () => {
     await expectAccessibleLayout(page)
   })
 })
+
+test('o atalho de pular para o conteúdo mantém o código do link', async ({ page }) => {
+  await openManagePage(page)
+  await page.keyboard.press('Tab')
+  await expect(page.getByRole('link', { name: 'Pular para o conteúdo' })).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(page.locator('main')).toBeFocused()
+  await expect(page).toHaveURL(new RegExp(`#${MANAGE_TOKEN}$`))
+  await expect(page.getByRole('heading', { level: 1, name: 'Seu agendamento' })).toBeVisible()
+})
+
+test.describe('em tela de toque', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+
+  test('links e botões da página do link têm pelo menos 44 px', async ({ page }) => {
+    await openManagePage(page)
+    for (const name of ['Remarcar', 'Cancelar agendamento']) {
+      const box = await page.getByRole('button', { name }).boundingBox()
+      expect(box?.height, name).toBeGreaterThanOrEqual(44)
+    }
+  })
+})
