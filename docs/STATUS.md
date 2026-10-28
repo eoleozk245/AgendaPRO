@@ -13,15 +13,17 @@
 | 5. Página pública                                | Feita                                        | **Aplicada** (pelo SQL Editor)                       |
 | 6. Acessibilidade, testes finais, CI, publicação | Feita; falta o Léo criar o projeto na Vercel | —                                                    |
 | 7a. Equipe (D-020)                               | Feita, em PR                                 | **Não aplicada** (2 migrações)                       |
+| 7b. Cliente cancela/remarca pelo link (D-022)    | Feita, em PR separado                        | **Não aplicada** (depende da 7a)                     |
 
 O banco real já tem as quatro migrações (conferido em 27/10 com `list_migrations` e consultas ao catálogo; ver `DATABASE.md`). Os tipos do TypeScript agora vêm do gerador do Supabase.
 
 ## O que falta
 
-1. **Aplicar no banco real as migrações da equipe e da correção dos bloqueios** (`20261027120000_team.sql` e `20261027130000_blocks_isolation.sql`), gerar os tipos de novo e só então juntar o PR na `main`. O painel novo chama a função `set_professional_services`, que só existe depois da migração.
-2. **Rodar no banco real os testes pgTAP da agenda e da página pública.** Nas três tentativas a ferramenta do Supabase pediu confirmação ao Léo e desistiu. Ambos passam no PostgreSQL 16 local e no CI. O de cadastros (22/22) e o de isolamento (16/16) já passaram no banco real.
-3. **Ajustes no painel do Supabase** (`SECURITY.md`): senha mínima de 8 caracteres, proteção contra senhas vazadas e URLs de redirecionamento.
-4. **Tratar a LGPD** (proposta D-019) antes de clientes reais.
+1. **Aplicar no banco real as migrações da equipe e da correção dos bloqueios** (`20261027120000_team.sql` e `20261027130000_blocks_isolation.sql`), gerar os tipos de novo e só então juntar o PR na `main`. O painel novo chama a função `set_professional_services`, que só existe depois da migração. A ferramenta do Supabase não consegue mostrar a pergunta de confirmação ao Léo, então o caminho é o SQL Editor.
+2. **Depois, a 7b:** aplicar `20261028100000_client_self_service.sql` e juntar o PR dela.
+3. **Rodar no banco real os testes pgTAP da agenda e da página pública.** Nas três tentativas a ferramenta do Supabase pediu confirmação ao Léo e desistiu. Ambos passam no PostgreSQL 16 local e no CI. O de cadastros (22/22) e o de isolamento (16/16) já passaram no banco real.
+4. **Ajustes no painel do Supabase** (`SECURITY.md`): senha mínima de 8 caracteres, proteção contra senhas vazadas e URLs de redirecionamento.
+5. **Tratar a LGPD** (proposta D-019) antes de clientes reais.
 
 ## Verificações feitas
 

@@ -157,6 +157,36 @@ export function tomorrowSlots(): string[] {
   )
 }
 
+/** Código do link do cliente que o mock reconhece (fictício). */
+export const MANAGE_TOKEN = 'e2eToken0123456789abcdefghijklmnopqrstuvwxy'
+
+/** O que o link do cliente mostra: reserva de amanhã às 09:00, ainda pendente. */
+function clientBooking() {
+  const [startsAt] = tomorrowSlots()
+  return {
+    organization: {
+      name: organization.name,
+      slug: organization.slug,
+      timezone: organization.timezone,
+      max_days_ahead: 30,
+    },
+    appointment: {
+      starts_at: startsAt,
+      ends_at: new Date(Date.parse(startsAt) + 30 * 60_000).toISOString(),
+      status: 'pending',
+      service_name: 'Corte de cabelo',
+      duration_minutes: 30,
+      price_cents: 4500,
+      professional_name: 'Profissional Exemplo',
+    },
+    changes: {
+      enabled: true,
+      deadline: new Date(Date.parse(startsAt) - 120 * 60_000).toISOString(),
+      problem: null,
+    },
+  }
+}
+
 function json(route: Route, body: unknown, status = 200) {
   return route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) })
 }
@@ -214,8 +244,27 @@ export async function mockSupabase(page: Page, options: MockOptions = {}) {
           price_cents: 4500,
           status: 'pending',
         },
+        manage_token: MANAGE_TOKEN,
+        changes: {
+          enabled: true,
+          deadline: new Date(Date.parse(startsAt) - 120 * 60_000).toISOString(),
+        },
       })
     }
+    if (path === '/rest/v1/rpc/get_client_booking') {
+      const { p_token: token } = route.request().postDataJSON() as { p_token: string }
+      return json(route, token === MANAGE_TOKEN ? clientBooking() : null)
+    }
+    if (path === '/rest/v1/rpc/get_client_reschedule_slots') {
+      return json(
+        route,
+        tomorrowSlots()
+          .slice(1)
+          .map((startsAt) => ({ starts_at: startsAt })),
+      )
+    }
+    if (path === '/rest/v1/rpc/cancel_client_booking') return json(route, { ok: true })
+    if (path === '/rest/v1/rpc/reschedule_client_booking') return json(route, { ok: true })
 
     const tables: Record<string, unknown[]> = {
       '/rest/v1/organizations': [organization],

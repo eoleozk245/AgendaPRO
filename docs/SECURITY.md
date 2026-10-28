@@ -37,6 +37,14 @@ Não dá para mudar estas configurações pelas ferramentas desta sessão. Elas 
 - O IP vem dos cabeçalhos repassados pelo Supabase (`cf-connecting-ip` / `x-forwarded-for`). Se ele não vier, valem os outros limites.
 - Os horários livres não revelam quem ocupa os outros.
 
+## Link do cliente (D-022)
+
+- O código do link tem 256 bits aleatórios (dois UUID v4 do gerador forte do PostgreSQL). O banco guarda só o **hash SHA-256**: quem ler a tabela não consegue montar o link.
+- O código fica depois do `#` no endereço. Navegadores não enviam essa parte ao servidor, então ela fica fora dos logs e do `Referer`.
+- O link mostra só serviço, profissional, horário, valor, situação e prazo, sem telefone e sem nome.
+- Cancelar e remarcar passam por funções no banco, que conferem código, situação e prazo. Remarcar também confere horário livre e conta no limite de tentativas da reserva.
+- **Risco aceito:** quem tiver o link consegue cancelar ou remarcar. A tela de confirmação avisa para não compartilhar. Com 256 bits, adivinhar um código não é viável.
+
 ## LGPD (proposta D-019)
 
 **Já existe no código:**
