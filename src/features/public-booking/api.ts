@@ -120,6 +120,11 @@ const clientBookingSchema = z.object({
     deadline: z.string(),
     /** Por que não dá para mudar pelo link; null quando dá. */
     problem: z.string().nullable(),
+    /**
+     * Dá para remarcar: além das regras gerais, ainda há remarcações no limite e
+     * o profissional ainda faz o serviço. Se não, só cancelar.
+     */
+    can_reschedule: z.boolean(),
     /** Quantas remarcações pelo link ainda restam (limite por agendamento). */
     reschedules_left: z.number(),
   }),

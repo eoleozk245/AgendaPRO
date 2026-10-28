@@ -29,9 +29,9 @@ O banco real já tem as quatro migrações (conferido em 27/10 com `list_migrati
 
 - **GitHub Actions verde** no PR (jobs App e Banco). A primeira execução pegou um teste com corrida de tempo, já corrigido.
 - `npm run lint`, `format:check`, `typecheck` e `build`: sem erros.
-- `npm test`: **211 testes** passando (componentes, telas, regras de negócio, contraste, fuso, dinheiro, estados, cabeçalhos de segurança, equipe, página pública com vários profissionais).
-- `npm run test:e2e`: **14 testes Playwright** passando, com o Supabase simulado: login e senha errada, painel sem sessão, página pública (computador e celular escuro), validação, agenda do dia e da semana, detalhes do agendamento, serviços e modal com Esc, equipe (incluindo salvar) e troca de profissional na agenda, páginas não encontradas. Todos passam pelo axe-core e conferem rolagem horizontal. Também roda no CI (job "E2E (Playwright)").
-- `npm run test:db`: **122 testes pgTAP** passando no PostgreSQL 16 local, com as 6 migrações (isolamento 16, cadastros 22, agenda 27, página pública 20, equipe 31, bloqueios 6). Também rodou como usuário comum, igual ao CI.
+- `npm test`: **278 testes** passando (componentes, telas, regras de negócio, contraste, fuso, dinheiro, estados, cabeçalhos de segurança, equipe, página pública com vários profissionais, link do cliente).
+- `npm run test:e2e`: **22 testes Playwright** passando, com o Supabase simulado: login e senha errada, painel sem sessão, página pública (computador e celular escuro), validação, agenda do dia e da semana, detalhes do agendamento, serviços e modal com Esc, equipe (incluindo salvar) e troca de profissional na agenda, link do cliente (confirmação, remarcar, cancelar, link inválido, atalho de teclado, toque), páginas não encontradas. Todos passam pelo axe-core e conferem rolagem horizontal. Também roda no CI (job "E2E (Playwright)").
+- `npm run test:db`: **176 testes pgTAP** passando no PostgreSQL 16 local, com as 7 migrações (isolamento 16, cadastros 22, agenda 27, página pública 20, equipe 31, bloqueios 6, link do cliente 54). Também rodou como usuário comum, igual ao CI.
 - **Revisão da Etapa 7a com 4 subagentes** (backend, segurança, frontend e testes), em 27/10. Achados aceitos e corrigidos:
   - um vazamento entre estabelecimentos pelos bloqueios (já existia antes da 7a);
   - mensagens de erro que revelavam dados de outro estabelecimento;
@@ -39,6 +39,13 @@ O banco real já tem as quatro migrações (conferido em 27/10 com `list_migrati
   - lista com nulos na função de serviços;
   - um profissional "fantasma" ao cancelar depois de uma falha;
   - agendamento que "sumia" da agenda depois de salvo.
+
+- **Revisão da Etapa 7b com 3 subagentes** (segurança, banco, frontend e testes), em 28/10. Corrigidos:
+  - o atalho "Pular para o conteúdo" apagava o código do link;
+  - a remarcação usava a duração atual do serviço, e não a reservada;
+  - o limite de remarcações virou por agendamento (3), para não poder ser esgotado por terceiros;
+  - o link passou a expirar (cliente excluído ou 30 dias depois);
+  - estados da tela quando o prazo vence ou a atualização falha.
 
   As travas de concorrência foram conferidas com duas conexões simultâneas num PostgreSQL 16 local: a reserva espera a desativação ou a troca de serviços terminar e então é recusada.
 

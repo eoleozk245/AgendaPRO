@@ -103,7 +103,7 @@ function ManageBooking({
     ? appointment.status
     : 'pending'
   const canChange = status !== 'cancelled' && !changes.problem
-  const canReschedule = canChange && changes.reschedules_left > 0
+  const canReschedule = canChange && changes.can_reschedule
   const [rescheduling, setRescheduling] = useState(false)
   const [confirmingCancel, setConfirmingCancel] = useState(false)
   const [notice, setNotice] = useState<Notice>()

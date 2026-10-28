@@ -35,6 +35,7 @@ const booking: ClientBooking = {
     enabled: true,
     deadline: '2030-01-08T11:00:00Z',
     problem: null,
+    can_reschedule: true,
     reschedules_left: 3,
   },
 }
@@ -214,7 +215,7 @@ describe('ManageBookingPage', () => {
     it('sem remarcações restantes, só oferece cancelar e explica', async () => {
       api.fetchClientBooking.mockResolvedValue({
         ...booking,
-        changes: { ...booking.changes, reschedules_left: 0 },
+        changes: { ...booking.changes, can_reschedule: false, reschedules_left: 0 },
       })
       renderPage()
       expect(await screen.findByText(/Já não dá para remarcar pelo link/)).toBeInTheDocument()
